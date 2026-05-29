@@ -1,0 +1,3971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZynLaw — Personal AI-Powered Legal Consultation Platform</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- Font Awesome CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* ==========================================
+       CSS VARIABLES & BRAND DESIGN SYSTEM
+       ========================================== */
+    :root {
+      /* Colors */
+      --bg-dark-1: #0a0a0a;
+      --bg-dark-2: #1a1a2e;
+      --bg-dark-3: #16213e;
+      
+      --accent-gold: #c9a84c;
+      --accent-gold-hover: #e5c060;
+      --accent-gold-glow: rgba(201, 168, 76, 0.4);
+      --accent-silver: #a6a6a6;
+      --accent-silver-glow: rgba(166, 166, 166, 0.2);
+      
+      --text-primary: #ffffff;
+      --text-muted: #8e9bb0;
+      --text-dark: #0a0a0a;
+      
+      --card-bg: rgba(15, 16, 26, 0.85);
+      --card-border-gradient: linear-gradient(135deg, rgba(166, 166, 166, 0.3) 0%, rgba(166, 166, 166, 0.05) 50%, rgba(201, 168, 76, 0.4) 100%);
+      
+      /* Spacing & Padding Metrics */
+      --spacing-scale: 1.0;
+      --base-font-size: 16px;
+      --line-height-base: 1.5;
+      --border-radius-scale: 1.0;
+      
+      /* Button custom sizing variables */
+      --btn-padding-y: 12px;
+      --btn-padding-x: 24px;
+      --btn-radius: 8px;
+      --btn-border: 1px solid rgba(201, 168, 76, 0.5);
+      
+      /* Status Colors */
+      --status-active: #00e676;
+      --status-pending: #ffb300;
+      --status-closed: #ff1744;
+      --status-active-glow: rgba(0, 230, 118, 0.2);
+      --status-pending-glow: rgba(255, 179, 0, 0.2);
+      --status-closed-glow: rgba(255, 23, 68, 0.2);
+      
+      /* Shadows & Effects */
+      --glow-shadow: 0 0 25px rgba(201, 168, 76, 0.25);
+      --silver-glow: 0 0 20px rgba(166, 166, 166, 0.15);
+      --card-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+      
+      /* Transitions */
+      --transition-speed: 0.3s;
+    }
+
+    /* Elder Mode Variable Overrides */
+    body.elder-mode {
+      --base-font-size: 22px;
+      --line-height-base: 1.9;
+      --spacing-scale: 1.4;
+      --border-radius-scale: 1.5;
+      
+      --accent-gold: #ffdf00; /* Brighter high contrast gold */
+      --accent-gold-hover: #ffffff;
+      --text-muted: #ffffff; /* pure white text for readability */
+      
+      /* Double padding and scale border radius */
+      --btn-padding-y: 24px;
+      --btn-padding-x: 48px;
+      --btn-radius: 16px;
+      --btn-border: 3px solid #ffdf00;
+      
+      --card-bg: rgba(5, 5, 10, 0.98);
+      --card-border-gradient: linear-gradient(135deg, #ffffff 0%, #ffdf00 100%);
+      --glow-shadow: 0 0 35px rgba(255, 223, 0, 0.5);
+    }
+
+    /* ==========================================
+       BASE & RESET STYLES
+       ========================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: var(--base-font-size);
+      line-height: var(--line-height-base);
+      background-color: var(--bg-dark-1);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(201, 168, 76, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(30, 41, 90, 0.35) 0%, transparent 50%),
+        linear-gradient(135deg, var(--bg-dark-1) 0%, var(--bg-dark-2) 50%, var(--bg-dark-3) 100%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      overflow-x: hidden;
+      transition: font-size var(--transition-speed), line-height var(--transition-speed), background var(--transition-speed);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+    }
+
+    a {
+      color: var(--accent-gold);
+      text-decoration: none;
+      transition: color var(--transition-speed);
+    }
+
+    a:hover {
+      color: var(--accent-gold-hover);
+    }
+
+    /* Custom Dotted/Mesh Grid Overlay */
+    .grid-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(rgba(166, 166, 166, 0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ==========================================
+       SPLASH SCREEN
+       ========================================== */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--bg-dark-1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.8s ease, visibility 0.8s;
+    }
+
+    #splash-screen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .scales-container {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .scales-svg {
+      width: 120px;
+      height: 120px;
+      fill: none;
+      stroke: var(--accent-gold);
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 15px var(--accent-gold-glow));
+      animation: balanceScales 4s ease-in-out infinite;
+    }
+
+    .splash-title {
+      font-size: 3.5rem;
+      margin-bottom: 12px;
+      animation: fadeInText 1.5s ease-in-out forwards;
+      opacity: 0;
+    }
+
+    .splash-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      animation: fadeInText 2s ease-in-out 0.5s forwards;
+      opacity: 0;
+    }
+
+    /* Splash Animations */
+    @keyframes balanceScales {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-6deg); }
+      75% { transform: rotate(6deg); }
+    }
+
+    @keyframes fadeInText {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Elegant Brand Text */
+    .brand-zyn {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+      font-style: italic;
+      color: var(--accent-gold);
+      text-shadow: 0 0 8px var(--accent-gold-glow);
+    }
+
+    .brand-law {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 300;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
+
+    /* ==========================================
+       METALLIC GLASS CARDS & INTERFACE ELEMENTS
+       ========================================== */
+    .metal-card {
+      background-color: var(--card-bg);
+      border: 1px solid transparent;
+      background-image: 
+        linear-gradient(var(--card-bg), var(--card-bg)), 
+        var(--card-border-gradient);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      border-radius: calc(16px * var(--border-radius-scale));
+      box-shadow: var(--card-shadow);
+      padding: calc(24px * var(--spacing-scale));
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, border var(--transition-speed);
+      z-index: 1;
+    }
+
+    .metal-card:hover {
+      box-shadow: var(--glow-shadow);
+    }
+
+    /* Decorative metal frame */
+    .metal-frame {
+      border: 1px solid rgba(166, 166, 166, 0.2);
+      padding: 6px;
+      border-radius: calc(18px * var(--border-radius-scale));
+      background: linear-gradient(135deg, rgba(20, 20, 25, 0.5) 0%, rgba(40, 40, 55, 0.5) 100%);
+    }
+
+    /* Buttons */
+    .btn-gold {
+      background: linear-gradient(135deg, var(--accent-gold) 0%, #a38131 100%);
+      color: var(--text-dark);
+      font-weight: 600;
+      border: var(--btn-border);
+      padding: var(--btn-padding-y) var(--btn-padding-x);
+      border-radius: var(--btn-radius);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: inherit;
+      transition: all var(--transition-speed) ease;
+      box-shadow: 0 4px 15px rgba(201, 168, 76, 0.2);
+    }
+
+    .btn-gold:hover {
+      background: linear-gradient(135deg, var(--accent-gold-hover) 0%, var(--accent-gold) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(201, 168, 76, 0.4);
+    }
+
+    .btn-gold:active {
+      transform: translateY(0);
+    }
+
+    .btn-silver {
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%);
+      color: var(--text-primary);
+      font-weight: 500;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: var(--btn-padding-y) var(--btn-padding-x);
+      border-radius: var(--btn-radius);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: inherit;
+      transition: all var(--transition-speed) ease;
+    }
+
+    .btn-silver:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--accent-gold);
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff1744 0%, #b21030 100%);
+      color: white;
+      font-weight: 500;
+      border: 1px solid transparent;
+      padding: var(--btn-padding-y) var(--btn-padding-x);
+      border-radius: var(--btn-radius);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: inherit;
+      transition: all var(--transition-speed) ease;
+    }
+
+    .btn-danger:hover {
+      filter: brightness(1.25);
+      transform: translateY(-2px);
+    }
+
+    /* Inputs & Selects */
+    .input-field {
+      width: 100%;
+      background: rgba(5, 5, 10, 0.85);
+      border: 1px solid rgba(166, 166, 166, 0.25);
+      padding: calc(12px * var(--spacing-scale));
+      border-radius: calc(8px * var(--border-radius-scale));
+      color: var(--text-primary);
+      font-size: inherit;
+      font-family: inherit;
+      transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 10px rgba(201, 168, 76, 0.25);
+    }
+
+    .input-group {
+      margin-bottom: calc(20px * var(--spacing-scale));
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .input-group label {
+      font-weight: 500;
+      color: var(--text-muted);
+      font-size: calc(inherit * 0.95);
+    }
+
+    /* ==========================================
+       ONBOARDING SCREEN
+       ========================================== */
+    #onboarding-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 10;
+      position: relative;
+    }
+
+    .onboarding-card {
+      width: 100%;
+      max-width: 650px;
+      margin-bottom: 20px;
+    }
+
+    .onboarding-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .onboarding-header .logo-symbol {
+      font-size: 3rem;
+      color: var(--accent-gold);
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px var(--accent-gold-glow);
+    }
+
+    .onboarding-header h2 {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+
+    .onboarding-header p {
+      color: var(--text-muted);
+    }
+
+    .onboarding-steps-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .step-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(166, 166, 166, 0.2);
+      transition: background var(--transition-speed), transform var(--transition-speed);
+    }
+
+    .step-dot.active {
+      background: var(--accent-gold);
+      transform: scale(1.2);
+      box-shadow: 0 0 8px var(--accent-gold);
+    }
+
+    .onboarding-step {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out forwards;
+    }
+
+    .onboarding-step.active {
+      display: block;
+    }
+
+    .onboarding-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    /* ==========================================
+       APP SHELL & NAVIGATION
+       ========================================== */
+    #app-container {
+      display: none; /* Flex when visible */
+      min-height: 100vh;
+      flex-direction: column;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Top Navigation bar (Desktop) */
+    .top-navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 5%;
+      background: rgba(5, 5, 10, 0.9);
+      border-bottom: 1px solid rgba(166, 166, 166, 0.1);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-brand .brand-logo {
+      font-size: 1.8rem;
+      color: var(--accent-gold);
+      text-shadow: 0 0 8px var(--accent-gold-glow);
+    }
+
+    .nav-brand .brand-text {
+      font-size: 1.8rem;
+    }
+
+    .nav-links-desktop {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
+
+    .nav-links-desktop li a {
+      color: var(--text-muted);
+      font-weight: 500;
+      position: relative;
+      padding: 8px 0;
+      cursor: pointer;
+      transition: color var(--transition-speed);
+    }
+
+    .nav-links-desktop li a.active,
+    .nav-links-desktop li a:hover {
+      color: var(--accent-gold);
+    }
+
+    .nav-links-desktop li a.active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--accent-gold);
+      box-shadow: 0 0 8px var(--accent-gold);
+      border-radius: 2px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    /* Language Switcher Dropdown */
+    .lang-dropdown-container {
+      position: relative;
+    }
+
+    .lang-btn-current {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(166, 166, 166, 0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition-speed);
+    }
+
+    .lang-btn-current:hover {
+      border-color: var(--accent-gold);
+      background: rgba(255,255,255,0.1);
+    }
+
+    .lang-dropdown-list {
+      position: absolute;
+      top: 115%;
+      right: 0;
+      background: var(--bg-dark-2);
+      border: 1px solid rgba(166, 166, 166, 0.2);
+      border-radius: 12px;
+      width: 220px;
+      box-shadow: var(--card-shadow);
+      display: none;
+      flex-direction: column;
+      padding: 8px;
+      z-index: 1000;
+      max-height: 400px;
+      overflow-y: auto;
+      backdrop-filter: blur(15px);
+    }
+
+    .lang-dropdown-list.active {
+      display: flex;
+    }
+
+    .lang-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background var(--transition-speed);
+    }
+
+    .lang-option:hover {
+      background: rgba(201, 168, 76, 0.15);
+      color: var(--accent-gold);
+    }
+
+    /* Bottom Navigation (Mobile) */
+    .bottom-navbar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(5, 5, 10, 0.96);
+      border-top: 1px solid rgba(166, 166, 166, 0.1);
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color var(--transition-speed);
+    }
+
+    .bottom-nav-item i {
+      font-size: 1.3rem;
+    }
+
+    .bottom-nav-item.active {
+      color: var(--accent-gold);
+    }
+
+    /* Main Viewport */
+    .main-viewport {
+      flex: 1;
+      padding: calc(40px * var(--spacing-scale)) 5%;
+      padding-bottom: 110px; /* offset bottom bar */
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .page-section {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out forwards;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    /* Global disclaimer banner */
+    .disclaimer-banner {
+      background: rgba(255, 23, 68, 0.08);
+      border: 1px solid rgba(255, 23, 68, 0.25);
+      border-radius: 8px;
+      padding: 12px 20px;
+      margin-bottom: calc(25px * var(--spacing-scale));
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 0.9rem;
+      color: #ff8a80;
+    }
+
+    .disclaimer-banner i {
+      font-size: 1.2rem;
+    }
+
+    /* Global footer */
+    .global-footer {
+      width: 100%;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 0.8rem;
+      color: var(--accent-gold);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-top: 1px solid rgba(166, 166, 166, 0.06);
+      z-index: 10;
+      margin-top: auto;
+    }
+
+    /* ==========================================
+       TAB 1: AI LEGAL CHATBOT
+       ========================================== */
+    .chatbot-layout {
+      display: grid;
+      grid-template-columns: 2.2fr 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+      height: 650px;
+    }
+
+    .chat-history {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: rgba(5, 5, 10, 0.6);
+      border-radius: 12px;
+      border: 1px solid rgba(166, 166, 166, 0.08);
+      margin-bottom: 15px;
+    }
+
+    .chat-bubble {
+      max-width: 75%;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: calc(inherit * 0.95);
+      position: relative;
+      animation: bubblePop 0.3s ease-out;
+      line-height: inherit;
+    }
+
+    .chat-bubble p {
+      margin-bottom: 8px;
+    }
+
+    .chat-bubble p:last-child {
+      margin-bottom: 0;
+    }
+
+    .chat-bubble.bot {
+      align-self: flex-start;
+      background: rgba(20, 22, 35, 0.95);
+      border-left: 3px solid var(--accent-gold);
+      box-shadow: var(--silver-glow);
+    }
+
+    .chat-bubble.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, rgba(201, 168, 76, 0.15) 0%, rgba(201, 168, 76, 0.03) 100%);
+      border-right: 3px solid var(--accent-gold);
+      border-top-left-radius: 12px;
+      border-bottom-right-radius: 0;
+      box-shadow: var(--glow-shadow);
+    }
+
+    .chat-bubble-speaker {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--accent-gold);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      border-radius: 50%;
+      transition: background var(--transition-speed), color var(--transition-speed);
+      display: none;
+    }
+
+    body.elder-mode .chat-bubble-speaker,
+    .chat-bubble.bot:hover .chat-bubble-speaker {
+      display: block;
+    }
+
+    .chat-bubble-speaker:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--accent-gold-hover);
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      background: rgba(20, 22, 35, 0.95);
+      padding: 15px 25px;
+      border-radius: 20px;
+      align-items: center;
+      gap: 5px;
+      border-left: 3px solid var(--accent-gold);
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-gold);
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+
+    /* Suggestion Chips */
+    .suggestion-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .suggestion-chip {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(166, 166, 166, 0.2);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all var(--transition-speed);
+    }
+
+    .suggestion-chip:hover {
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+      background: rgba(201, 168, 76, 0.08);
+      transform: translateY(-1px);
+    }
+
+    /* Input Bar */
+    .chat-input-bar {
+      display: flex;
+      gap: 10px;
+      background: rgba(10, 10, 15, 0.9);
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(166, 166, 166, 0.2);
+    }
+
+    .chat-input-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: inherit;
+      padding: 10px;
+    }
+
+    .chat-input-bar input:focus {
+      outline: none;
+    }
+
+    .chat-action-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      color: var(--text-muted);
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: all var(--transition-speed);
+    }
+
+    .chat-action-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--accent-gold);
+    }
+
+    .chat-action-btn.active {
+      background: rgba(201, 168, 76, 0.2);
+      color: var(--accent-gold);
+      animation: pulseMic 1.5s infinite;
+    }
+
+    @keyframes pulseMic {
+      0% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(201, 168, 76, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0); }
+    }
+
+    /* Sidebar widget cards */
+    .home-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .tip-card {
+      background: linear-gradient(135deg, rgba(201, 168, 76, 0.1) 0%, rgba(15, 16, 26, 0.95) 100%);
+      border-left: 4px solid var(--accent-gold);
+    }
+
+    .tip-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: var(--accent-gold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .profile-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-silver) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dark);
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+
+    .profile-info h4 {
+      font-size: 1.1rem;
+      margin-bottom: 2px;
+    }
+
+    .profile-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================
+       TAB 2: DOCUMENT SCANNER TAB
+       ========================================== */
+    .scanner-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    .upload-zone {
+      border: 2px dashed rgba(166, 166, 166, 0.3);
+      background: rgba(10, 10, 15, 0.6);
+      border-radius: 16px;
+      padding: calc(45px * var(--spacing-scale)) calc(20px * var(--spacing-scale));
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--accent-gold);
+      background: rgba(201, 168, 76, 0.05);
+    }
+
+    .upload-icon {
+      font-size: 4rem;
+      color: var(--accent-gold);
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px var(--accent-gold-glow);
+    }
+
+    .camera-box {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .file-preview-box {
+      display: none;
+      width: 100%;
+      padding: 15px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .preview-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .preview-info i {
+      font-size: 2rem;
+      color: var(--accent-gold);
+    }
+
+    .preview-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+      word-break: break-all;
+    }
+
+    .preview-size {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .remove-file-btn {
+      background: none;
+      border: none;
+      color: var(--status-closed);
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    /* Analyzer Panel */
+    .analysis-results-panel {
+      display: none; /* Block when simulated analysis is complete */
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .analysis-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(166, 166, 166, 0.15);
+      padding-bottom: 15px;
+    }
+
+    .doc-type-badge {
+      background: rgba(201, 168, 76, 0.15);
+      color: var(--accent-gold);
+      border: 1px solid var(--accent-gold);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .analysis-section {
+      margin-bottom: 25px;
+    }
+
+    .analysis-section h4 {
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-gold);
+    }
+
+    .analysis-section ul {
+      list-style-position: inside;
+      padding-left: 5px;
+    }
+
+    .analysis-section li {
+      margin-bottom: 8px;
+      font-size: calc(inherit * 0.95);
+    }
+
+    .risk-flag-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-size: calc(inherit * 0.95);
+      line-height: inherit;
+    }
+
+    .risk-flag-item.red {
+      background: rgba(255, 23, 68, 0.08);
+      border-left: 4px solid var(--status-closed);
+      color: #ff8a80;
+    }
+
+    .risk-flag-item.amber {
+      background: rgba(255, 179, 0, 0.08);
+      border-left: 4px solid var(--status-pending);
+      color: #ffe082;
+    }
+
+    .risk-flag-item i {
+      margin-top: 4px;
+    }
+
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: calc(inherit * 0.9);
+    }
+
+    .details-table th, .details-table td {
+      border: 1px solid rgba(166, 166, 166, 0.15);
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .details-table th {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--accent-silver);
+      font-weight: 600;
+    }
+
+    .scanning-loader {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 50px 0;
+    }
+
+    .loader-circle {
+      width: 60px;
+      height: 60px;
+      border: 3px solid rgba(201, 168, 76, 0.1);
+      border-top-color: var(--accent-gold);
+      border-radius: 50%;
+      animation: spin 1s infinite linear;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ==========================================
+       TAB 3: MY RIGHTS TAB (KNOW YOUR RIGHTS)
+       ========================================== */
+    .rights-search-bar {
+      margin-bottom: 20px;
+    }
+
+    .rights-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+    }
+
+    .rights-category-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: var(--accent-gold);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(166,166,166,0.15);
+      padding-bottom: 10px;
+    }
+
+    /* Accordions */
+    .accordion-item {
+      border-bottom: 1px solid rgba(166, 166, 166, 0.1);
+      margin-bottom: 5px;
+    }
+
+    .accordion-header {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      text-align: left;
+      padding: 15px 10px;
+      font-size: calc(inherit * 1);
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: color var(--transition-speed);
+    }
+
+    .accordion-header:hover {
+      color: var(--accent-gold);
+    }
+
+    .accordion-header i {
+      transition: transform var(--transition-speed);
+      color: var(--accent-gold);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out, padding 0.3s;
+      padding: 0 10px;
+      color: var(--text-muted);
+      font-size: calc(inherit * 0.95);
+      line-height: inherit;
+    }
+
+    .accordion-item.active .accordion-header i {
+      transform: rotate(180deg);
+    }
+
+    .accordion-item.active .accordion-content {
+      max-height: 500px;
+      padding-bottom: 15px;
+    }
+
+    /* ==========================================
+       TAB 4: MY CASES (CASE TRACKER)
+       ========================================== */
+    .cases-dashboard {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .cases-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cases-stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .stat-mini-card {
+      text-align: center;
+      padding: 15px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .stat-val {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 5px;
+    }
+
+    .cases-list-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 25px;
+    }
+
+    .no-cases-placeholder {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 50px;
+      color: var(--text-muted);
+      border: 1px dashed rgba(166, 166, 166, 0.25);
+      border-radius: 16px;
+    }
+
+    /* Case Cards */
+    .case-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .case-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .case-badge {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .case-badge.active {
+      background: var(--status-active-glow);
+      color: var(--status-active);
+      border: 1px solid var(--status-active);
+    }
+
+    .case-badge.pending {
+      background: var(--status-pending-glow);
+      color: var(--status-pending);
+      border: 1px solid var(--status-pending);
+    }
+
+    .case-badge.closed {
+      background: var(--status-closed-glow);
+      color: var(--status-closed);
+      border: 1px solid var(--status-closed);
+    }
+
+    .case-card-title {
+      font-size: 1.25rem;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+
+    .case-card-category {
+      font-size: 0.85rem;
+      color: var(--accent-gold);
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .case-card-desc {
+      color: var(--text-muted);
+      font-size: calc(inherit * 0.95);
+      margin-bottom: 15px;
+      flex-grow: 1;
+    }
+
+    .case-card-meta {
+      border-top: 1px solid rgba(166,166,166,0.1);
+      padding-top: 12px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 0.85rem;
+    }
+
+    .case-card-meta div {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .case-card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    /* Custom SVG Graphic Dashboard (Mock Analytics) */
+    .analytics-visual-card {
+      grid-column: 1 / -1;
+      height: 220px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-container {
+      flex: 1;
+      position: relative;
+      width: 100%;
+    }
+
+    /* ==========================================
+       TAB 5: SETTINGS TAB
+       ========================================== */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    /* Toggle switches */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(166,166,166,0.1);
+    }
+
+    .toggle-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .toggle-info span {
+      font-weight: 500;
+    }
+
+    .toggle-info small {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 32px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      transition: .4s;
+      border-radius: 34px;
+      border: 1px solid rgba(166,166,166,0.2);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 24px;
+      width: 24px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--accent-silver);
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent-gold-glow);
+      border-color: var(--accent-gold);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(28px);
+      background-color: var(--accent-gold);
+    }
+
+    .font-preview-box {
+      border: 1px solid rgba(166, 166, 166, 0.2);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+      background: rgba(255,255,255,0.01);
+    }
+
+    .settings-lang-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .lang-grid-btn {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(166, 166, 166, 0.2);
+      padding: 10px;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      transition: all var(--transition-speed);
+    }
+
+    .lang-grid-btn:hover, .lang-grid-btn.active {
+      border-color: var(--accent-gold);
+      background: rgba(201, 168, 76, 0.12);
+      color: var(--accent-gold);
+    }
+
+    /* ==========================================
+       MODALS SYSTEM
+       ========================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 5, 10, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      width: 100%;
+      max-width: 600px;
+      background: var(--bg-dark-2);
+      border: 1px solid rgba(166, 166, 166, 0.2);
+      border-radius: 16px;
+      padding: 30px;
+      position: relative;
+      animation: modalSlide 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color var(--transition-speed);
+    }
+
+    .modal-close-btn:hover {
+      color: var(--status-closed);
+    }
+
+    .modal-title {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(166, 166, 166, 0.15);
+      padding-bottom: 10px;
+    }
+
+    /* Lawyer Directory Listing style */
+    .lawyer-card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .lawyer-listItem {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid rgba(166,166,166,0.15);
+      background: rgba(255,255,255,0.01);
+      transition: transform var(--transition-speed);
+    }
+
+    .lawyer-listItem:hover {
+      transform: translateX(5px);
+      border-color: var(--accent-gold);
+    }
+
+    .lawyer-info-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .lawyer-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .lawyer-spec {
+      font-size: 0.85rem;
+      color: var(--accent-gold);
+    }
+
+    .lawyer-rating {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .lawyer-rating i {
+      color: #ffd700;
+    }
+
+    .lawyer-fee {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    /* Toast notification */
+    .toast-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--bg-dark-3);
+      border-left: 4px solid var(--accent-gold);
+      box-shadow: var(--glow-shadow);
+      padding: 15px 25px;
+      border-radius: 8px;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      animation: slideInLeft 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    /* Keyframes */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInLeft {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes bubblePop {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* ==========================================
+       RESPONSIVE ADAPTABILITY
+       ========================================== */
+    @media (max-width: 1024px) {
+      .chatbot-layout, .scanner-layout, .rights-grid, .settings-grid {
+        grid-template-columns: 1fr;
+      }
+      .cases-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .cases-list-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .top-navbar {
+        padding: 12px 20px;
+      }
+      .nav-links-desktop {
+        display: none; /* Hide top nav links on mobile */
+      }
+      .bottom-navbar {
+        display: flex; /* Show bottom bar on mobile */
+      }
+      .main-viewport {
+        padding-top: 20px;
+        padding-bottom: 120px; /* offset for bottom navbar */
+      }
+      .settings-lang-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .splash-title {
+        font-size: 2.5rem;
+      }
+      .onboarding-buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .onboarding-buttons button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Dotted/Mesh Grid Overlay -->
+  <div class="grid-overlay"></div>
+
+  <!-- ==========================================
+       SPLASH / ENTRY SCREEN
+       ========================================== -->
+  <div id="splash-screen">
+    <div class="scales-container">
+      <svg class="scales-svg" viewBox="0 0 24 24">
+        <!-- Base Pillar -->
+        <line x1="12" y1="2" x2="12" y2="20" />
+        <line x1="8" y1="20" x2="16" y2="20" />
+        <path d="M12 4c-2 0-3 1-3 1s1 1 3 1 3-1 3-1-1-1-3-1z" />
+        <!-- Crossbeam -->
+        <line x1="3" y1="6" x2="21" y2="6" id="crossbeam" />
+        <!-- Left Scale -->
+        <line x1="3" y1="6" x2="3" y2="12" />
+        <path d="M1 12h4l-2 4z" />
+        <!-- Right Scale -->
+        <line x1="21" y1="6" x2="21" y2="12" />
+        <path d="M19 12h4l-2 4z" />
+      </svg>
+    </div>
+    <h1 class="splash-title"><span class="brand-zyn">Zyn</span><span class="brand-law">Law</span></h1>
+    <p class="splash-subtitle" data-i18n="tagline">Your Personal AI Legal Advisor</p>
+  </div>
+
+  <!-- ==========================================
+       ONBOARDING FLOW CONTAINER
+       ========================================== -->
+  <div id="onboarding-container" style="display: none;">
+    <div class="metal-frame onboarding-card">
+      <div class="metal-card">
+        <div class="onboarding-header">
+          <div class="logo-symbol">⚖️</div>
+          <h2 data-i18n="welcome">Welcome to ZynLaw</h2>
+          <p data-i18n="onboarding_desc">Let's set up your profile to start your AI-powered legal assistance.</p>
+        </div>
+
+        <div class="onboarding-steps-indicator">
+          <div class="step-dot active" id="dot-1"></div>
+          <div class="step-dot" id="dot-2"></div>
+          <div class="step-dot" id="dot-3"></div>
+        </div>
+
+        <form id="onboarding-form" onsubmit="event.preventDefault();">
+          
+          <!-- Step 1: Personal Details -->
+          <div class="onboarding-step active" id="step-1-content">
+            <h3 style="margin-bottom: 20px; color: var(--accent-gold);" data-i18n="personal_details">Personal Details</h3>
+            
+            <div class="input-group">
+              <label for="ob-name" data-i18n="full_name">Full Name</label>
+              <input type="text" id="ob-name" class="input-field" placeholder="John Doe" required>
+            </div>
+
+            <div class="input-group">
+              <label for="ob-age" data-i18n="age">Age</label>
+              <input type="number" id="ob-age" class="input-field" placeholder="35" required min="1" max="120">
+            </div>
+
+            <div class="input-group">
+              <label for="ob-gender" data-i18n="gender">Gender</label>
+              <select id="ob-gender" class="input-field" required>
+                <option value="" disabled selected data-i18n="select_gender">Select Gender</option>
+                <option value="Male" data-i18n="gender_male">Male</option>
+                <option value="Female" data-i18n="gender_female">Female</option>
+                <option value="Other" data-i18n="gender_other">Other</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="ob-lang" data-i18n="pref_lang">Preferred Language</label>
+              <select id="ob-lang" class="input-field" required>
+                <option value="en">English</option>
+                <option value="hi">Hindi (हिन्दी)</option>
+                <option value="bn">Bengali (বাংলা)</option>
+                <option value="te">Telugu (తెలుగు)</option>
+                <option value="mr">Marathi (मराठी)</option>
+                <option value="ta">Tamil (தமிழ்)</option>
+                <option value="gu">Gujarati (ગુજરાતી)</option>
+                <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                <option value="ml">Malayalam (മലയാളം)</option>
+                <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                <option value="ur">Urdu (اردو)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Step 2: Location & Contact -->
+          <div class="onboarding-step" id="step-2-content">
+            <h3 style="margin-bottom: 20px; color: var(--accent-gold);" data-i18n="location_contact">Location & Contact</h3>
+            
+            <div class="input-group">
+              <label data-i18n="city" for="ob-city">Residential Area / City</label>
+              <input type="text" id="ob-city" class="input-field" placeholder="Bengaluru" required>
+            </div>
+
+            <div class="input-group">
+              <label data-i18n="state" for="ob-state">State</label>
+              <select id="ob-state" class="input-field" required>
+                <option value="" disabled selected data-i18n="select_state">Select State</option>
+                <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                <option value="Assam">Assam</option>
+                <option value="Bihar">Bihar</option>
+                <option value="Chandigarh">Chandigarh</option>
+                <option value="Chhattisgarh">Chhattisgarh</option>
+                <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Goa">Goa</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Haryana">Haryana</option>
+                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                <option value="Jharkhand">Jharkhand</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Kerala">Kerala</option>
+                <option value="Ladakh">Ladakh</option>
+                <option value="Lakshadweep">Lakshadweep</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Manipur">Manipur</option>
+                <option value="Meghalaya">Meghalaya</option>
+                <option value="Mizoram">Mizoram</option>
+                <option value="Nagaland">Nagaland</option>
+                <option value="Odisha">Odisha</option>
+                <option value="Puducherry">Puducherry</option>
+                <option value="Punjab">Punjab</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Sikkim">Sikkim</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Telangana">Telangana</option>
+                <option value="Tripura">Tripura</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Uttarakhand">Uttarakhand</option>
+                <option value="West Bengal">West Bengal</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label data-i18n="pin" for="ob-pin">PIN Code</label>
+              <input type="text" id="ob-pin" class="input-field" placeholder="560001" required pattern="\d{6}">
+            </div>
+
+            <div class="input-group">
+              <label data-i18n="phone" for="ob-phone">Phone Number (Optional)</label>
+              <input type="tel" id="ob-phone" class="input-field" placeholder="+91 9876543210">
+            </div>
+          </div>
+
+          <!-- Step 3: Legal Preferences -->
+          <div class="onboarding-step" id="step-3-content">
+            <h3 style="margin-bottom: 20px; color: var(--accent-gold);" data-i18n="legal_pref">Legal Preferences</h3>
+            
+            <div class="input-group">
+              <label data-i18n="legal_concern" for="ob-concern">Primary Area of Legal Concern</label>
+              <select id="ob-concern" class="input-field" required>
+                <option value="" disabled selected data-i18n="select_concern">Select Area</option>
+                <option value="Property" data-i18n="concern_property">Property & Tenancy</option>
+                <option value="Family" data-i18n="concern_family">Family Law</option>
+                <option value="Criminal" data-i18n="concern_criminal">Criminal Law</option>
+                <option value="Consumer Rights" data-i18n="concern_consumer">Consumer Rights</option>
+                <option value="Labor" data-i18n="concern_labor">Labor & Employment</option>
+                <option value="Civil" data-i18n="concern_civil">Civil Disputes</option>
+                <option value="Other" data-i18n="concern_other">Other / General Consultation</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label data-i18n="situation_desc" for="ob-situation">Brief Description of Your Situation</label>
+              <textarea id="ob-situation" class="input-field" style="resize: vertical; min-height: 100px;" placeholder="Describe your situation here..."></textarea>
+            </div>
+          </div>
+
+          <!-- Onboarding Navigation Buttons -->
+          <div class="onboarding-buttons">
+            <button type="button" class="btn-silver" id="ob-back-btn" style="visibility: hidden;" onclick="prevOnboardingStep()">
+              <i class="fa-solid fa-arrow-left"></i> <span data-i18n="back">Back</span>
+            </button>
+            <button type="button" class="btn-gold" id="ob-next-btn" onclick="nextOnboardingStep()">
+              <span data-i18n="next">Next</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+    
+    <!-- Onboarding Footer -->
+    <div class="global-footer" style="border: none;">Made by ZynAppz</div>
+  </div>
+
+  <!-- ==========================================
+       MAIN APP SHELL
+       ========================================== -->
+  <div id="app-container">
+    
+    <!-- Top Navbar (Desktop) -->
+    <nav class="top-navbar">
+      <div class="nav-brand">
+        <span class="brand-logo">⚖️</span>
+        <span class="brand-text"><span class="brand-zyn">Zyn</span><span class="brand-law">Law</span></span>
+      </div>
+
+      <ul class="nav-links-desktop">
+        <li><a class="active" onclick="switchTab('home')" id="tab-link-desktop-home" data-i18n="nav_home">Home</a></li>
+        <li><a onclick="switchTab('scan')" id="tab-link-desktop-scan" data-i18n="nav_scan">Scan Doc</a></li>
+        <li><a onclick="switchTab('rights')" id="tab-link-desktop-rights" data-i18n="nav_rights">My Rights</a></li>
+        <li><a onclick="switchTab('cases')" id="tab-link-desktop-cases" data-i18n="nav_cases">My Cases</a></li>
+        <li><a onclick="switchTab('settings')" id="tab-link-desktop-settings" data-i18n="nav_settings">Settings</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Language Switcher Dropdown -->
+        <div class="lang-dropdown-container">
+          <button class="lang-btn-current" id="lang-btn-desktop" onclick="toggleLangDropdown()">
+            🌐 <span>English</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem;"></i>
+          </button>
+          <div class="lang-dropdown-list" id="lang-dropdown-desktop">
+            <div class="lang-option" onclick="changeLanguage('en')">🇬🇧 English</div>
+            <div class="lang-option" onclick="changeLanguage('hi')">🇮🇳 हिन्दी (Hindi)</div>
+            <div class="lang-option" onclick="changeLanguage('bn')">🇮🇳 বাংলা (Bengali)</div>
+            <div class="lang-option" onclick="changeLanguage('te')">🇮🇳 తెలుగు (Telugu)</div>
+            <div class="lang-option" onclick="changeLanguage('mr')">🇮🇳 मराठी (Marathi)</div>
+            <div class="lang-option" onclick="changeLanguage('ta')">🇮🇳 தமிழ் (Tamil)</div>
+            <div class="lang-option" onclick="changeLanguage('gu')">🇮🇳 ગુજરાતી (Gujarati)</div>
+            <div class="lang-option" onclick="changeLanguage('kn')">🇮🇳 ಕನ್ನಡ (Kannada)</div>
+            <div class="lang-option" onclick="changeLanguage('ml')">🇮🇳 മലയാളം (Malayalam)</div>
+            <div class="lang-option" onclick="changeLanguage('pa')">🇮🇳 ਪੰਜਾਬੀ (Punjabi)</div>
+            <div class="lang-option" onclick="changeLanguage('or')">🇮🇳 ଓଡ଼ିଆ (Odia)</div>
+            <div class="lang-option" onclick="changeLanguage('ur')">🇮🇳 اردو (Urdu)</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Viewport -->
+    <main class="main-viewport">
+      
+      <!-- Global Disclaimer Banner -->
+      <div class="disclaimer-banner">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span data-i18n="disclaimer_banner">Disclaimer: ZynLaw provides general legal information, not legal advice. For serious matters, consult a qualified lawyer.</span>
+      </div>
+
+      <!-- ==========================================
+           TAB 1: HOME SCREEN (AI LEGAL CHATBOT)
+           ========================================== -->
+      <section id="page-home" class="page-section active">
+        <div class="chatbot-layout">
+          <!-- Chat Window -->
+          <div class="metal-frame chat-panel">
+            <div class="metal-card" style="display: flex; flex-direction: column; height: 100%; padding: 20px;">
+              <div class="chat-history" id="chat-history-container">
+                <!-- Chat messages injected here -->
+              </div>
+
+              <!-- Typing Indicator -->
+              <div class="typing-indicator" id="chat-typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+              </div>
+
+              <!-- Suggestion Chips -->
+              <div class="suggestion-container" id="suggestion-chips-container">
+                <!-- Suggested action chips injected here -->
+              </div>
+
+              <!-- Chat Input Bar -->
+              <div class="chat-input-bar">
+                <input type="text" id="chat-user-input" placeholder="Ask ZynBot a legal question..." data-i18n-placeholder="ask_placeholder" onkeydown="if(event.key === 'Enter') sendChatMessage()">
+                <button class="chat-action-btn" id="voice-input-btn" onclick="toggleVoiceInput()" title="Voice Input">
+                  <i class="fa-solid fa-microphone"></i>
+                </button>
+                <button class="chat-action-btn" onclick="sendChatMessage()" style="background: var(--accent-gold); color: var(--text-dark);" title="Send Message">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar Widgets -->
+          <div class="home-sidebar">
+            <!-- User Profile Badge -->
+            <div class="metal-frame">
+              <div class="metal-card user-profile-badge">
+                <div class="profile-avatar" id="user-avatar-initials">JD</div>
+                <div class="profile-info">
+                  <h4 id="user-welcome-name">Hello, User!</h4>
+                  <p id="user-welcome-details">Language: English • Age: 35</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Know Your Rights Daily Tip -->
+            <div class="metal-frame">
+              <div class="metal-card tip-card">
+                <h3 data-i18n="tip_title"><i class="fa-solid fa-lightbulb"></i> Daily Legal Tip</h3>
+                <p id="daily-tip-content">Loading daily legal tip...</p>
+              </div>
+            </div>
+
+            <!-- Quick Action Links -->
+            <div class="metal-frame">
+              <div class="metal-card">
+                <h3 style="font-size: 1.25rem; margin-bottom: 15px; color: var(--accent-gold);" data-i18n="sidebar_quick_links">Quick Navigation</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <button class="btn-silver" onclick="switchTab('scan')" style="justify-content: flex-start; text-align: left; width: 100%;">
+                    <i class="fa-solid fa-expand"></i> <span data-i18n="nav_scan">Scan Doc</span>
+                  </button>
+                  <button class="btn-silver" onclick="switchTab('cases')" style="justify-content: flex-start; text-align: left; width: 100%;">
+                    <i class="fa-solid fa-folder-open"></i> <span data-i18n="nav_cases">My Cases</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 2: DOCUMENT SCANNER
+           ========================================== -->
+      <section id="page-scan" class="page-section">
+        <div class="scanner-layout">
+          <!-- Upload Panel -->
+          <div class="metal-frame">
+            <div class="metal-card" style="height: 100%;">
+              <h2 style="font-size: 1.8rem; margin-bottom: 15px; color: var(--accent-gold);" data-i18n="scan_title">AI Document Scanner</h2>
+              <p style="color: var(--text-muted); margin-bottom: 25px;" data-i18n="scan_desc">Upload agreements, summons, legal notices or contracts. Our compliance engine will parse it and highlight potential concerns.</p>
+              
+              <div class="upload-zone" id="drop-zone" onclick="triggerFileInput()">
+                <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                <h3 style="font-size: 1.3rem;" data-i18n="drag_drop">Drag & Drop Legal Document here</h3>
+                <p style="color: var(--text-muted);" data-i18n="or_choose">or click to browse your files (PNG, JPG, PDF)</p>
+                
+                <input type="file" id="file-uploader" style="display: none;" accept=".png, .jpg, .jpeg, .pdf" onchange="handleFileSelect(event)">
+              </div>
+
+              <!-- Camera trigger -->
+              <div class="camera-box">
+                <button class="btn-silver" onclick="simulateCameraCapture()" style="width: 100%;">
+                  <i class="fa-solid fa-camera"></i> <span data-i18n="camera_btn">Capture using Camera</span>
+                </button>
+              </div>
+
+              <!-- Dropdown to force a document type (for quick testing/demo) -->
+              <div class="input-group" style="margin-top: 20px;">
+                <label for="scan-override-type" data-i18n="scan_doc_type">Override Document Type (for Testing)</label>
+                <select id="scan-override-type" class="input-field">
+                  <option value="auto">Auto-Detect from Filename</option>
+                  <option value="rental">Rental Agreement / Lease</option>
+                  <option value="summons">Court Summons / Legal Notice</option>
+                  <option value="will">Last Will & Testament</option>
+                  <option value="contract">Employment Contract</option>
+                  <option value="fir">FIR Copy / Police Report</option>
+                </select>
+              </div>
+
+              <!-- File preview -->
+              <div class="file-preview-box" id="scanner-preview-box">
+                <div class="preview-info">
+                  <i class="fa-solid fa-file-contract"></i>
+                  <div>
+                    <div class="preview-name" id="preview-filename">rental_agreement.pdf</div>
+                    <div class="preview-size" id="preview-filesize">2.4 MB</div>
+                  </div>
+                </div>
+                <button class="remove-file-btn" onclick="clearFileSelection()" title="Remove file">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+
+              <!-- Action buttons -->
+              <div style="margin-top: 25px;">
+                <button class="btn-gold" id="start-scan-btn" onclick="runDocumentAnalysis()" style="width: 100%;" disabled>
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="start_analysis">Analyze Document</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results Panel -->
+          <div class="metal-frame">
+            <div class="metal-card" style="min-height: 500px;">
+              <!-- Scanning progress loader -->
+              <div class="scanning-loader" id="scanning-progress-loader">
+                <div class="loader-circle"></div>
+                <h3 style="color: var(--accent-gold);" data-i18n="scanning_text">Scanning and Analyzing compliance...</h3>
+                <p style="color: var(--text-muted);" data-i18n="scanning_sub">Parsing clauses, signatures, and risk items...</p>
+              </div>
+
+              <!-- Analysis placeholder -->
+              <div id="analysis-placeholder-view" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: var(--text-muted); padding: 50px 0;">
+                <i class="fa-solid fa-chart-line" style="font-size: 4rem; color: rgba(255,255,255,0.05); margin-bottom: 20px;"></i>
+                <h3 data-i18n="no_analysis_title">No Analysis Results</h3>
+                <p data-i18n="no_analysis_desc">Select and run a document analysis to extract legal clauses and risk variables.</p>
+              </div>
+
+              <!-- Actual Analysis content panel -->
+              <div class="analysis-results-panel" id="analysis-results-view">
+                <div class="analysis-header">
+                  <h3 style="font-size: 1.5rem;" data-i18n="scan_results">AI Analysis Results</h3>
+                  <span class="doc-type-badge" id="res-doc-type">Rental Agreement</span>
+                </div>
+
+                <!-- Section 1: Identified Doc Info -->
+                <div class="analysis-section">
+                  <h4 data-i18n="key_details"><i class="fa-solid fa-receipt"></i> Key Details Extracted</h4>
+                  <table class="details-table" id="res-details-table">
+                    <!-- Extracted rows injected here -->
+                  </table>
+                </div>
+
+                <!-- Section 2: Legal Rights -->
+                <div class="analysis-section">
+                  <h4 data-i18n="legal_rights"><i class="fa-solid fa-shield-halved"></i> Your Legal Rights</h4>
+                  <ul id="res-rights-list" style="list-style-type: disc;">
+                    <!-- Rights injected here -->
+                  </ul>
+                </div>
+
+                <!-- Section 3: Recommended Actions -->
+                <div class="analysis-section">
+                  <h4 data-i18n="actions"><i class="fa-solid fa-list-check"></i> Recommended Actions</h4>
+                  <ol id="res-actions-list" style="margin-left: 20px;">
+                    <!-- Actions injected here -->
+                  </ol>
+                </div>
+
+                <!-- Section 4: Risk Flags -->
+                <div class="analysis-section">
+                  <h4 data-i18n="risk_flags" style="color: #ff8a80;"><i class="fa-solid fa-triangle-exclamation"></i> Risk Flags & Warnings</h4>
+                  <div id="res-risk-flags">
+                    <!-- Warning blocks injected here -->
+                  </div>
+                </div>
+
+                <!-- Export Action -->
+                <div style="margin-top: 30px;">
+                  <button class="btn-silver" onclick="downloadAnalysisReport()" style="width: 100%;">
+                    <i class="fa-solid fa-download"></i> <span data-i18n="download_summary">Download Summary Report</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 3: MY RIGHTS TAB
+           ========================================== -->
+      <section id="page-rights" class="page-section">
+        <div class="metal-frame" style="margin-bottom: 25px;">
+          <div class="metal-card">
+            <h2 style="font-size: 2rem; margin-bottom: 10px; color: var(--accent-gold);" data-i18n="rights_directory_title">Interactive Legal Rights Directory</h2>
+            <p style="color: var(--text-muted);" data-i18n="rights_directory_desc">Browse your fundamental and statutory rights under Indian Jurisprudence. Expand details to see relevant laws and constitutional citations.</p>
+            
+            <div class="rights-search-bar" style="margin-top: 20px;">
+              <input type="text" id="rights-search-input" class="input-field" placeholder="Search rights (e.g. equality, consumer, tenant)..." data-i18n-placeholder="search_rights_placeholder" oninput="filterRights()">
+            </div>
+          </div>
+        </div>
+
+        <div class="rights-grid" id="rights-categories-grid">
+          <!-- Right categories injected here -->
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 4: MY CASES (CASE TRACKER)
+           ========================================== -->
+      <section id="page-cases" class="page-section">
+        <div class="cases-dashboard">
+          
+          <div class="cases-header-bar">
+            <div>
+              <h2 style="font-size: 2rem; color: var(--accent-gold);" data-i18n="cases_title">My Case Tracker</h2>
+              <p style="color: var(--text-muted);" data-i18n="cases_desc">Maintain details, hearing reminders, and legal logs for your ongoing issues.</p>
+            </div>
+            <button class="btn-gold" onclick="openAddCaseModal()">
+              <i class="fa-solid fa-plus"></i> <span data-i18n="add_case">Add New Case</span>
+            </button>
+          </div>
+
+          <!-- Stats Dashboard (MATVEYAN UI style) -->
+          <div class="cases-stats-row">
+            <div class="stat-mini-card">
+              <div class="stat-val" id="stat-total">0</div>
+              <div class="stat-label" data-i18n="stat_total">Total Cases</div>
+            </div>
+            <div class="stat-mini-card">
+              <div class="stat-val" id="stat-active" style="color: var(--status-active);">0</div>
+              <div class="stat-label" data-i18n="stat_active">Active</div>
+            </div>
+            <div class="stat-mini-card">
+              <div class="stat-val" id="stat-pending" style="color: var(--status-pending);">0</div>
+              <div class="stat-label" data-i18n="stat_pending">Pending</div>
+            </div>
+            <div class="stat-mini-card">
+              <div class="stat-val" id="stat-closed" style="color: var(--status-closed);">0</div>
+              <div class="stat-label" data-i18n="stat_closed">Closed</div>
+            </div>
+          </div>
+
+          <!-- Analytics Visual (MATVEYAN line chart replica) -->
+          <div class="metal-frame analytics-visual-card">
+            <div class="metal-card" style="height: 100%; display: flex; flex-direction: column; padding: 15px 20px;">
+              <h3 style="font-size: 1.1rem; color: var(--accent-silver); margin-bottom: 10px;" data-i18n="case_timeline_chart">Case Activity Analytics</h3>
+              <div class="chart-container">
+                <svg width="100%" height="100%" viewBox="0 0 500 120" preserveAspectRatio="none">
+                  <!-- Grid Lines -->
+                  <line x1="0" y1="20" x2="500" y2="20" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                  <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                  <line x1="0" y1="100" x2="500" y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                  <!-- Glowing Plot Area Gradient -->
+                  <defs>
+                    <linearGradient id="chart-glow" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="var(--accent-gold)" stop-opacity="0.2"/>
+                      <stop offset="100%" stop-color="var(--accent-gold)" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M 0 100 Q 100 80 200 40 T 400 90 L 500 20 L 500 120 L 0 120 Z" fill="url(#chart-glow)" />
+                  <!-- Plot lines -->
+                  <path d="M 0 100 Q 100 80 200 40 T 400 90 L 500 20" fill="none" stroke="var(--accent-gold)" stroke-width="2" filter="drop-shadow(0 0 4px var(--accent-gold-glow))" />
+                  <!-- Data Dots -->
+                  <circle cx="200" cy="40" r="4" fill="var(--text-primary)" stroke="var(--accent-gold)" stroke-width="1.5" />
+                  <circle cx="400" cy="90" r="4" fill="var(--text-primary)" stroke="var(--accent-gold)" stroke-width="1.5" />
+                  <circle cx="500" cy="20" r="4" fill="var(--text-primary)" stroke="var(--accent-gold)" stroke-width="1.5" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cases Listing grid -->
+          <div class="cases-list-grid" id="cases-grid-container">
+            <!-- Cases list items injected here -->
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 5: SETTINGS TAB
+           ========================================== -->
+      <section id="page-settings" class="page-section">
+        <div class="settings-grid">
+          
+          <!-- Access & Accessibility Controls -->
+          <div class="metal-frame">
+            <div class="metal-card">
+              <h3 style="font-size: 1.5rem; margin-bottom: 20px; color: var(--accent-gold);" data-i18n="accessibility_settings">Accessibility Settings</h3>
+              
+              <!-- Elder Mode toggle -->
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <span data-i18n="elder_mode">Elder Mode (60+)</span>
+                  <small data-i18n="elder_mode_desc">Enlarge UI text size, scale action buttons, raise line-height, and trigger automated audio consultation.</small>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="elder-mode-toggle" onchange="toggleElderMode(this.checked)">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <!-- live Preview Box -->
+              <div class="font-preview-box">
+                <p style="font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 8px;" data-i18n="font_preview_title">Live Font Size Preview</p>
+                <p id="settings-preview-text" data-i18n="font_preview">This text previews the readability sizing dynamically. Elder mode adjusts headings, icons, buttons and spacing parameters accordingly.</p>
+              </div>
+
+              <!-- Notifications UI Only -->
+              <div class="toggle-row" style="margin-top: 15px; border-bottom: none;">
+                <div class="toggle-info">
+                  <span data-i18n="notification_pref">Hearing Reminders & Notifications</span>
+                  <small data-i18n="notification_pref_desc">Receive browser alerts for scheduled case hearings and consultant updates.</small>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="notifications-toggle" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Language Preferences & System Management -->
+          <div class="metal-frame">
+            <div class="metal-card">
+              <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--accent-gold);" data-i18n="language_pref">Preferred Language</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem;" data-i18n="lang_grid_desc">Choose your default language. This automatically translates all panels, forms, chatbot answers, and speech synthesizers.</p>
+              
+              <div class="settings-lang-grid" id="settings-lang-select-grid">
+                <button class="lang-grid-btn" id="lang-grid-en" onclick="changeLanguage('en')">🇬🇧 English</button>
+                <button class="lang-grid-btn" id="lang-grid-hi" onclick="changeLanguage('hi')">हिन्दी</button>
+                <button class="lang-grid-btn" id="lang-grid-bn" onclick="changeLanguage('bn')">বাংলা</button>
+                <button class="lang-grid-btn" id="lang-grid-te" onclick="changeLanguage('te')">తెలుగు</button>
+                <button class="lang-grid-btn" id="lang-grid-mr" onclick="changeLanguage('mr')">मराठी</button>
+                <button class="lang-grid-btn" id="lang-grid-ta" onclick="changeLanguage('ta')">தமிழ்</button>
+                <button class="lang-grid-btn" id="lang-grid-gu" onclick="changeLanguage('gu')">ગુજરાતી</button>
+                <button class="lang-grid-btn" id="lang-grid-kn" onclick="changeLanguage('kn')">ಕನ್ನಡ</button>
+                <button class="lang-grid-btn" id="lang-grid-ml" onclick="changeLanguage('ml')">മലയാളം</button>
+                <button class="lang-grid-btn" id="lang-grid-pa" onclick="changeLanguage('pa')">ਪੰਜਾਬੀ</button>
+                <button class="lang-grid-btn" id="lang-grid-or" onclick="changeLanguage('or')">ଓଡ଼ିଆ</button>
+                <button class="lang-grid-btn" id="lang-grid-ur" onclick="changeLanguage('ur')">اردو</button>
+              </div>
+
+              <!-- Storage reset -->
+              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(166, 166, 166, 0.15);">
+                <h4 style="margin-bottom: 10px;" data-i18n="data_management">System Reset</h4>
+                <button class="btn-danger" onclick="clearAllUserData()" style="width: 100%;">
+                  <i class="fa-solid fa-trash-arrow-up"></i> <span data-i18n="clear_data">Clear All My Data</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- About ZynLaw Card -->
+          <div class="metal-frame" style="grid-column: 1 / -1;">
+            <div class="metal-card">
+              <h3 style="font-size: 1.5rem; margin-bottom: 15px; color: var(--accent-gold);" data-i18n="about_title">About ZynLaw</h3>
+              <p style="color: var(--text-muted); margin-bottom: 15px;" data-i18n="about_desc">ZynLaw is an AI-powered legal assistant and document compliance scanner. Version 1.0.0</p>
+              
+              <!-- Privacy Accordion -->
+              <div class="accordion-item" style="border: 1px solid rgba(166, 166, 166, 0.2); border-radius: 8px; margin-top: 15px;">
+                <button class="accordion-header" onclick="toggleAccordion(this)">
+                  <span data-i18n="privacy_policy">Privacy & Confidentiality Policy</span>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div class="accordion-content">
+                  <p data-i18n="privacy_content">All data and chat history processed by ZynLaw is saved exclusively in your browser's local sandbox storage. No documents, phone numbers, or consultation notes are sent to external servers, securing your absolute attorney-client privilege during mock consultation operations.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar (Mobile) -->
+    <nav class="bottom-navbar">
+      <a class="bottom-nav-item active" onclick="switchTab('home')" id="tab-link-mobile-home">
+        <i class="fa-solid fa-house"></i>
+        <span data-i18n="nav_home">Home</span>
+      </a>
+      <a class="bottom-nav-item" onclick="switchTab('scan')" id="tab-link-mobile-scan">
+        <i class="fa-solid fa-qrcode"></i>
+        <span data-i18n="nav_scan">Scan Doc</span>
+      </a>
+      <a class="bottom-nav-item" onclick="switchTab('rights')" id="tab-link-mobile-rights">
+        <i class="fa-solid fa-scale-balanced"></i>
+        <span data-i18n="nav_rights">My Rights</span>
+      </a>
+      <a class="bottom-nav-item" onclick="switchTab('cases')" id="tab-link-mobile-cases">
+        <i class="fa-solid fa-briefcase"></i>
+        <span data-i18n="nav_cases">Cases</span>
+      </a>
+      <a class="bottom-nav-item" onclick="switchTab('settings')" id="tab-link-mobile-settings">
+        <i class="fa-solid fa-gear"></i>
+        <span data-i18n="nav_settings">Settings</span>
+      </a>
+    </nav>
+
+    <!-- Footer Tagline -->
+    <div class="global-footer">
+      Made by ZynAppz
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODALS DECK
+       ========================================== -->
+
+  <!-- Modal 1: Lawyer booking deck -->
+  <div class="modal-overlay" id="lawyer-directory-modal">
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="closeModal('lawyer-directory-modal')">&times;</button>
+      <h2 class="modal-title" data-i18n="connect_lawyer_title">Connect with Verified Human Lawyer</h2>
+      <p style="color: var(--text-muted);" data-i18n="lawyer_modal_sub">Select an advocate specialized in your specific jurisdiction for direct legal guidance.</p>
+      
+      <div class="lawyer-card-list" id="lawyers-list-container">
+        <!-- Lawyer elements injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Appointment Confirmation -->
+  <div class="modal-overlay" id="booking-confirm-modal">
+    <div class="modal-content" style="text-align: center;">
+      <button class="modal-close-btn" onclick="closeModal('booking-confirm-modal')">&times;</button>
+      <i class="fa-solid fa-circle-check" style="font-size: 4rem; color: var(--status-active); margin-bottom: 20px;"></i>
+      <h2 class="modal-title" style="border: none; margin-bottom: 10px;" data-i18n="appointment_confirmed">Appointment Booked!</h2>
+      <p style="color: var(--text-muted); margin-bottom: 20px;" id="booking-summary-text">Your slots has been registered.</p>
+      
+      <button class="btn-gold" onclick="closeModal('booking-confirm-modal')" style="width: 100%;">
+        <span data-i18n="done">Done</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal 3: Case Creator Form -->
+  <div class="modal-overlay" id="case-creator-modal">
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="closeModal('case-creator-modal')">&times;</button>
+      <h2 class="modal-title" id="case-modal-title-text" data-i18n="add_case">Add New Case</h2>
+      
+      <form id="case-form" onsubmit="saveCaseRecord(event)">
+        <input type="hidden" id="case-edit-index" value="-1">
+        
+        <div class="input-group">
+          <label for="case-form-title" data-i18n="case_title_lbl">Case Title</label>
+          <input type="text" id="case-form-title" class="input-field" required placeholder="e.g. Security Deposit Recovery">
+        </div>
+
+        <div class="input-group">
+          <label for="case-form-category" data-i18n="case_category_lbl">Category</label>
+          <select id="case-form-category" class="input-field" required>
+            <option value="Property" data-i18n="concern_property">Property & Tenancy</option>
+            <option value="Family" data-i18n="concern_family">Family Law</option>
+            <option value="Criminal" data-i18n="concern_criminal">Criminal Law</option>
+            <option value="Consumer Rights" data-i18n="concern_consumer">Consumer Rights</option>
+            <option value="Labor" data-i18n="concern_labor">Labor & Employment</option>
+            <option value="Civil" data-i18n="concern_civil">Civil Disputes</option>
+            <option value="Other" data-i18n="concern_other">Other</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="case-form-desc" data-i18n="case_desc_lbl">Brief Description</label>
+          <textarea id="case-form-desc" class="input-field" style="resize: vertical; min-height: 80px;" required placeholder="Brief outline of notes..."></textarea>
+        </div>
+
+        <div class="input-group">
+          <label for="case-form-date" data-i18n="hearing_date">Next Hearing / Action Date</label>
+          <input type="date" id="case-form-date" class="input-field" required>
+        </div>
+
+        <div class="input-group">
+          <label for="case-form-status" data-i18n="status_lbl">Status</label>
+          <select id="case-form-status" class="input-field" required>
+            <option value="Active" data-i18n="status_active">Active</option>
+            <option value="Pending" data-i18n="status_pending">Pending</option>
+            <option value="Closed" data-i18n="status_closed">Closed</option>
+          </select>
+        </div>
+
+        <div style="margin-top: 25px; display: flex; gap: 15px;">
+          <button type="button" class="btn-silver" onclick="closeModal('case-creator-modal')" style="flex: 1;" data-i18n="cancel">Cancel</button>
+          <button type="submit" class="btn-gold" style="flex: 2;" data-i18n="save">Save Case</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast notification banner -->
+  <div class="toast-notification" id="app-toast-alert">
+    <i class="fa-solid fa-circle-info" style="color: var(--accent-gold);"></i>
+    <span id="toast-alert-text">Message</span>
+  </div>
+
+  <!-- ==========================================
+       JAVASCRIPT IMPLEMENTATION
+       ========================================== -->
+  <script>
+    /* ==========================================
+       LOCALIZATION DICTIONARY (12+ LANGUAGES)
+       ========================================== */
+    const translations = {
+      en: {
+        tagline: "Your Personal AI Legal Advisor",
+        welcome: "Welcome to ZynLaw",
+        onboarding_desc: "Set up your profile to start your AI-powered legal assistance.",
+        personal_details: "Personal Details",
+        location_contact: "Location & Contact",
+        legal_pref: "Legal Preferences",
+        full_name: "Full Name",
+        age: "Age",
+        gender: "Gender",
+        select_gender: "Select Gender",
+        gender_male: "Male",
+        gender_female: "Female",
+        gender_other: "Other",
+        pref_lang: "Preferred Language",
+        city: "City / Residential Area",
+        state: "State",
+        select_state: "Select State",
+        pin: "PIN Code",
+        phone: "Phone Number (Optional)",
+        legal_concern: "Primary Legal Concern",
+        select_concern: "Select Area",
+        concern_property: "Property & Tenancy",
+        concern_family: "Family Law",
+        concern_criminal: "Criminal Law",
+        concern_consumer: "Consumer Rights",
+        concern_labor: "Labor & Employment",
+        concern_civil: "Civil Disputes",
+        concern_other: "Other / General",
+        situation_desc: "Describe your situation",
+        submit: "Submit",
+        next: "Next",
+        back: "Back",
+        nav_home: "Home",
+        nav_scan: "Scan Doc",
+        nav_rights: "My Rights",
+        nav_cases: "My Cases",
+        nav_settings: "Settings",
+        disclaimer_banner: "Disclaimer: ZynLaw provides general legal information, not legal advice. For serious matters, consult a qualified lawyer.",
+        ask_placeholder: "Ask ZynBot a legal question...",
+        tip_title: "Daily Legal Tip",
+        sidebar_quick_links: "Quick Navigation",
+        scan_title: "AI Document Scanner",
+        scan_desc: "Upload agreements, summons, legal notices or contracts. Our compliance engine will parse it and highlight potential concerns.",
+        drag_drop: "Drag & Drop Legal Document here",
+        or_choose: "or click to browse your files (PNG, JPG, PDF)",
+        camera_btn: "Capture using Camera",
+        scan_doc_type: "Override Document Type (for Testing)",
+        start_analysis: "Analyze Document",
+        scanning_text: "Scanning and Analyzing compliance...",
+        scanning_sub: "Parsing clauses, signatures, and risk items...",
+        no_analysis_title: "No Analysis Results",
+        no_analysis_desc: "Select and run a document analysis to extract legal clauses and risk variables.",
+        scan_results: "AI Analysis Results",
+        key_details: "Key Details Extracted",
+        legal_rights: "Your Legal Rights",
+        actions: "Recommended Actions",
+        risk_flags: "Risk Flags & Warnings",
+        download_summary: "Download Summary Report",
+        rights_directory_title: "Interactive Legal Rights Directory",
+        rights_directory_desc: "Browse your fundamental and statutory rights under Indian Jurisprudence. Expand details to see relevant laws and constitutional citations.",
+        search_rights_placeholder: "Search rights (e.g. equality, consumer, tenant)...",
+        cases_title: "My Case Tracker",
+        cases_desc: "Maintain details, hearing reminders, and legal logs for your ongoing issues.",
+        add_case: "Add New Case",
+        stat_total: "Total Cases",
+        stat_active: "Active",
+        stat_pending: "Pending",
+        stat_closed: "Closed",
+        case_timeline_chart: "Case Activity Analytics",
+        accessibility_settings: "Accessibility Settings",
+        elder_mode: "Elder Mode (60+)",
+        elder_mode_desc: "Enlarge UI text size, scale action buttons, raise line-height, and trigger automated audio consultation.",
+        font_preview_title: "Live Font Size Preview",
+        font_preview: "This text previews the readability sizing dynamically. Elder mode adjusts headings, icons, buttons and spacing parameters accordingly.",
+        notification_pref: "Hearing Reminders & Notifications",
+        notification_pref_desc: "Receive browser alerts for scheduled case hearings and consultant updates.",
+        language_pref: "Preferred Language",
+        lang_grid_desc: "Choose your default language. This automatically translates all panels, forms, chatbot answers, and speech synthesizers.",
+        data_management: "System Reset",
+        clear_data: "Clear All My Data",
+        about_title: "About ZynLaw",
+        about_desc: "ZynLaw is an AI-powered legal assistant and document compliance scanner. Version 1.0.0",
+        privacy_policy: "Privacy & Confidentiality Policy",
+        privacy_content: "All data and chat history processed by ZynLaw is saved exclusively in your browser's local sandbox storage. No documents, phone numbers, or consultation notes are sent to external servers, securing your absolute attorney-client privilege.",
+        connect_lawyer_title: "Connect with Verified Human Lawyer",
+        lawyer_modal_sub: "Select an advocate specialized in your specific jurisdiction for direct legal guidance.",
+        appointment_confirmed: "Appointment Booked!",
+        done: "Done",
+        case_title_lbl: "Case Title",
+        case_category_lbl: "Category",
+        case_desc_lbl: "Brief Description",
+        hearing_date: "Next Hearing / Action Date",
+        status_lbl: "Status",
+        cancel: "Cancel",
+        save: "Save Case"
+      },
+      hi: {
+        tagline: "आपका व्यक्तिगत एआई कानूनी सलाहकार",
+        welcome: "ZynLaw में आपका स्वागत है",
+        onboarding_desc: "अपनी प्रोफ़ाइल सेट करें ताकि एआई सहायता शुरू हो सके।",
+        personal_details: "व्यक्तिगत विवरण",
+        location_contact: "स्थान और संपर्क",
+        legal_pref: "कानूनी प्राथमिकताएं",
+        full_name: "पूरा नाम",
+        age: "आयु",
+        gender: "लिंग",
+        select_gender: "लिंग चुनें",
+        gender_male: "पुरुष",
+        gender_female: "महिला",
+        gender_other: "अन्य",
+        pref_lang: "पसंदीदा भाषा",
+        city: "शहर / क्षेत्र",
+        state: "राज्य",
+        select_state: "राज्य चुनें",
+        pin: "पिन कोड",
+        phone: "फ़ोन नंबर (वैकल्पिक)",
+        legal_concern: "प्राथमिक कानूनी चिंता",
+        select_concern: "क्षेत्र चुनें",
+        concern_property: "संपत्ति और किरायेदारी",
+        concern_family: "पारिवारिक कानून",
+        concern_criminal: "आपराधिक कानून",
+        concern_consumer: "उपभोक्ता अधिकार",
+        concern_labor: "श्रम और रोजगार",
+        concern_civil: "दीवानी विवाद",
+        concern_other: "अन्य / सामान्य",
+        situation_desc: "अपनी स्थिति का वर्णन करें",
+        submit: "जमा करें",
+        next: "अगला",
+        back: "पीछे",
+        nav_home: "होम",
+        nav_scan: "दस्तावेज़ स्कैन",
+        nav_rights: "मेरे अधिकार",
+        nav_cases: "मेरे मामले",
+        nav_settings: "सेटिंग्स",
+        disclaimer_banner: "अस्वीकरण: ZynLaw सामान्य कानूनी जानकारी प्रदान करता है, कानूनी सलाह नहीं। गंभीर मामलों के लिए वकील से संपर्क करें।",
+        ask_placeholder: "ZynBot से कानूनी प्रश्न पूछें...",
+        tip_title: "दैनिक कानूनी टिप",
+        sidebar_quick_links: "त्वरित नेविगेशन",
+        scan_title: "एआई दस्तावेज़ स्कैनर",
+        scan_desc: "अनुबंध, सम्मन, कानूनी नोटिस अपलोड करें। हमारा अनुपालन इंजन संभावित चिंताओं को उजागर करेगा।",
+        drag_drop: "यहाँ कानूनी दस्तावेज़ खींचें और छोड़ें",
+        or_choose: "या ब्राउज़ करने के लिए क्लिक करें (PNG, JPG, PDF)",
+        camera_btn: "कैमरा का उपयोग करें",
+        scan_doc_type: "दस्तावेज़ प्रकार बदलें (परीक्षण के लिए)",
+        start_analysis: "दस्तावेज़ का विश्लेषण करें",
+        scanning_text: "अनुपालन का विश्लेषण किया जा रहा है...",
+        scanning_sub: "खंडों और जोखिम वस्तुओं को पार्स किया जा रहा है...",
+        no_analysis_title: "कोई विश्लेषण परिणाम नहीं",
+        no_analysis_desc: "कानूनी खंडों को निकालने के लिए दस्तावेज़ विश्लेषण चलाएं।",
+        scan_results: "एआई विश्लेषण परिणाम",
+        key_details: "निकाले गए मुख्य विवरण",
+        legal_rights: "आपके कानूनी अधिकार",
+        actions: "अनुशंसित कार्रवाइयां",
+        risk_flags: "जोखिम झंडे और चेतावनी",
+        download_summary: "सारांश रिपोर्ट डाउनलोड करें",
+        rights_directory_title: "इंटरैक्टिव कानूनी अधिकार निर्देशिका",
+        rights_directory_desc: "भारतीय कानून के तहत अपने मौलिक और वैधानिक अधिकारों को ब्राउज़ करें।",
+        search_rights_placeholder: "अधिकार खोजें (जैसे समानता, उपभोक्ता, किरायेदार)...",
+        cases_title: "मेरा केस ट्रैकर",
+        cases_desc: "अपने चल रहे मामलों के लिए विवरण, सुनवाई अनुस्मारक और कानूनी लॉग बनाए रखें।",
+        add_case: "नया केस जोड़ें",
+        stat_total: "कुल मामले",
+        stat_active: "सक्रिय",
+        stat_pending: "लंबित",
+        stat_closed: "बंद",
+        case_timeline_chart: "केस गतिविधि विश्लेषण",
+        accessibility_settings: "एक्सेसिबिलिटी सेटिंग्स",
+        elder_mode: "एल्डर मोड (60+)",
+        elder_mode_desc: "पाठ का आकार बढ़ाएं, बटनों को बड़ा करें और व्यक्तिगत ऑडियो परामर्श सक्रिय करें।",
+        font_preview_title: "लाइव फ़ॉन्ट पूर्वावलोकन",
+        font_preview: "यह पाठ पठनीयता के आकार का पूर्वावलोकन दिखाता है। एल्डर मोड तदनुसार समायोजित करता है।",
+        notification_pref: "सुनवाई अनुस्मारक और सूचनाएं",
+        notification_pref_desc: "मामले की सुनवाई और अपडेट के लिए अलर्ट प्राप्त करें।",
+        language_pref: "पसंदीदा भाषा",
+        lang_grid_desc: "अपनी भाषा चुनें। यह स्वचालित रूप से चैटबॉट्स और अनुवादों को अपडेट करता है।",
+        data_management: "सिस्टम रीसेट",
+        clear_data: "मेरा पूरा डेटा साफ़ करें",
+        about_title: "ZynLaw के बारे में",
+        about_desc: "ZynLaw एक एआई-संचालित कानूनी सहायक और दस्तावेज़ अनुपालन स्कैनर है। संस्करण 1.0.0",
+        privacy_policy: "गोपनीयता नीति",
+        privacy_content: "ZynLaw द्वारा संसाधित सभी डेटा आपके ब्राउज़र के स्थानीय सैंडबॉक्स में सहेजा जाता है। कोई संवेदनशील जानकारी सर्वर पर नहीं भेजी जाती है।",
+        connect_lawyer_title: "सत्यापित वकील से जुड़ें",
+        lawyer_modal_sub: "सीधे मार्गदर्शन के लिए अपने क्षेत्राधिकार में विशेषज्ञ वकील का चयन करें।",
+        appointment_confirmed: "नियुक्ति बुक हो गई!",
+        done: "पूर्ण",
+        case_title_lbl: "केस शीर्षक",
+        case_category_lbl: "श्रेणी",
+        case_desc_lbl: "संक्षिप्त विवरण",
+        hearing_date: "अगली सुनवाई तिथि",
+        status_lbl: "स्थिति",
+        cancel: "रद्द करें",
+        save: "केस सहेजें"
+      },
+      bn: { tagline: "আপনার ব্যক্তিগত এআই আইনি উপদেষ্টা", welcome: "ZynLaw-এ আপনাকে স্বাগতম", personal_details: "ব্যক্তিগত বিবরণ", location_contact: "যোগাযোগের বিবরণ", legal_pref: "আইনি পছন্দ", next: "পরবর্তী", back: "ফিরে যান", nav_home: "হোম", nav_scan: "নথি স্ক্যান", nav_rights: "আমার অধিকার", nav_cases: "আমার মামলা", nav_settings: "সেটিংস", submit: "জমা দিন", add_case: "নতুন মামলা যোগ করুন", full_name: "পুরো নাম", age: "বয়স", gender: "লিঙ্গ", city: "শহর / আবাসিক এলাকা", state: "রাজ্য", pin: "পিন কোড", phone: "ফোন নম্বর (ঐচ্ছিক)", legal_concern: "আইনি সমস্যা", situation_desc: "আপনার পরিস্থিতি বর্ণনা করুন", disclaimer_banner: "দাবিত্যাগ: ZynLaw সাধারণ আইনি তথ্য প্রদান করে, আইনি পরামর্শ নয়। অভিজ্ঞ আইনজীবীর পরামর্শ নিন।" },
+      te: { tagline: "మీ వ్యక్తిగత AI న్యాయ సలహాదారు", welcome: "ZynLaw కి స్వాగతం", personal_details: "వ్యక్తిగత వివరాలు", location_contact: "చిరునామా & సంప్రదింపు", legal_pref: "న్యాయ ప్రాధాన్యతలు", next: "తరువాత", back: "వెనుకకు", nav_home: "హోమ్", nav_scan: "స్కాన్", nav_rights: "నా హక్కులు", nav_cases: "నా కేసులు", nav_settings: "సెట్టింగులు", submit: "సమర్పించు", add_case: "కొత్త కేసు జోడించు", full_name: "పూర్తి పేరు", age: "వయస్సు", gender: "లింగం", city: "నగరం / నివాస ప్రాంతం", state: "రాష్ట్రం", pin: "పిన్ కోడ్", phone: "ఫోన్ నంబర్ (ఐచ్ఛికం)", legal_concern: "ప్రధాన న్యాయ సమస్య", situation_desc: "మీ పరిస్థితిని వివరించండి", disclaimer_banner: "నిరాకరణ: ZynLaw సాధారణ న్యాయ సమాచారాన్ని మాత్రమే అందిస్తుంది, న్యాయ సలహా కాదు. అర్హతగల న్యాయవాదిని సంప్రదించండి." },
+      mr: { tagline: "तुमचा वैयक्तिक एआय कायदेशीर सल्लागार", welcome: "ZynLaw मध्ये आपले स्वागत आहे", personal_details: "वैयक्तिक तपशील", location_contact: "पत्ता आणि संपर्क", legal_pref: "कायदेशीर प्राधान्ये", next: "पुढील", back: "मागे", nav_home: "होम", nav_scan: "स्कॅन", nav_rights: "माझे हक्क", nav_cases: "माझ्या केसेस", nav_settings: "सेटिंग्ज", submit: "सादर करा", add_case: "नवीन केस जोडा", full_name: "पूर्ण नाव", age: "वय", gender: "लिंग", city: "शहर / निवासी क्षेत्र", state: "राज्य", pin: "पिन कोड", phone: "फोन नंबर (पर्यायी)", legal_concern: "कायदेशीर समस्या", situation_desc: "तुमच्या परिस्थितीचे वर्णन करा", disclaimer_banner: "अस्वीकरण: ZynLaw सामान्य कायदेशीर माहिती प्रदान करते, कायदेशीर सल्ला नाही. पात्र वकीलाचा सल्ला घ्या." },
+      ta: { tagline: "உங்கள் தனிப்பட்ட AI சட்ட ஆலோசகர்", welcome: "ZynLaw-க்கு வரவேற்கிறோம்", personal_details: "தனிப்பட்ட விவரங்கள்", location_contact: "முகவரி & தொடர்பு", legal_pref: "சட்ட விருப்பங்கள்", next: "அடுத்து", back: "பின்னால்", nav_home: "முகப்பு", nav_scan: "ஆவண ஸ்கேன்", nav_rights: "என் உரிமைகள்", nav_cases: "என் வழக்குகள்", nav_settings: "அமைப்புகள்", submit: "சமர்ப்பி", add_case: "வழக்கு சேர்க்க", full_name: "முழு பெயர்", age: "வயது", gender: "பாலினம்", city: "நகரம் / குடியிருப்பு பகுதி", state: "மாநிலம்", pin: "பின்கோடு", phone: "தொலைபேசி எண் (விருப்பம்)", legal_concern: "முக்கிய சட்ட சிக்கல்", situation_desc: "உங்கள் சூழ்நிலையை விவரிக்கவும்", disclaimer_banner: "துறப்பு: ZynLaw பொதுவான சட்ட தகவல்களை வழங்குகிறது, சட்ட ஆலோசனை அல்ல. தகுதிவாய்ந்த வழக்கறிஞரை அணுகவும்." },
+      gu: { tagline: "તમારા વ્યક્તિગત એઆઈ કાનૂની સલાહકાર", welcome: "ZynLaw માં તમારું સ્વાગત છે", personal_details: "વ્યક્તિગત વિગતો", location_contact: "સરનામું અને સંપર્ક", legal_pref: "કાનૂની પસંદગીઓ", next: "આગળ", back: "પાછળ", nav_home: "હોમ", nav_scan: "સ્કેન", nav_rights: "મારા અધિકારો", nav_cases: "મારા કેસો", nav_settings: "સેટિંગ્સ", submit: "સબમિટ", add_case: "નવો કેસ ઉમેરો", full_name: "પૂરું નામ", age: "ઉંમર", gender: "જાતિ", city: "શહેર / રહેણાંક વિસ્તાર", state: "રાજ્ય", pin: "પિન કોડ", phone: "ફોન નંબર (વૈકલ્પિક)", legal_concern: "કાનૂની સમસ્યા", situation_desc: "તમારી પરિસ્થિતિનું વર્ણન કરો", disclaimer_banner: "ડિસ્ક્લેમર: ZynLaw સામાન્ય કાનૂની માહિતી પ્રદાન કરે છે, કાનૂની સલાહ નહીં. યોગ્ય વકીલનો સંપર્ક કરો." },
+      kn: { tagline: "ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಐಆಯ್ ಕಾನೂನು ಸಲಹೆಗಾರ", welcome: "ZynLaw ಗೆ ಸ್ವಾಗತ", personal_details: "ವೈಯಕ್ತಿಕ ವಿವರಗಳು", location_contact: "ವಿಳಾಸ ಮತ್ತು ಸಂಪರ್ಕ", legal_pref: "ಕಾನೂನು ಆದ್ಯತೆಗಳು", next: "ಮುಂದೆ", back: "ಹಿಂದೆ", nav_home: "ಹೋಮ್", nav_scan: "ಸ್ಕ್ಯಾನ್", nav_rights: "ನನ್ನ ಹಕ್ಕುಗಳು", nav_cases: "ನನ್ನ ಪ್ರಕರಣಗಳು", nav_settings: "ಸಂയೋಜನೆಗಳು", submit: "ಸಲ್ಲಿಸು", add_case: "ಹೊಸ ಪ್ರಕರಣ ಸೇರಿಸಿ", full_name: "ಪೂರ್ಣ ಹೆಸರು", age: "ವಯಸ್ಸು", gender: "ಲಿಂಗ", city: "ನಗರ / ವಸತಿ ಪ್ರದೇಶ", state: "ರಾಜ್ಯ", pin: "ಪಿನ್ ಕೋಡ್", phone: "ಫೋನ್ ಸಂಖ್ಯೆ (ಐಚ್ಛಿಕ)", legal_concern: "ಮುಖ್ಯ ಕಾನೂನು ಕಾಳಜಿ", situation_desc: "ನಿಮ್ಮ ಪರಿಸ್ಥಿತಿಯನ್ನು ವಿವರಿಸಿ", disclaimer_banner: "ಹಕ್ಕುತ್ಯಾಗ: ZynLaw ಸಾಮಾನ್ಯ ಕಾನೂನು ಮಾಹಿತಿಯನ್ನು ಒದಗಿಸುತ್ತದೆ, ಕಾನೂನು ಸಲಹೆಯಲ್ಲ. ಅರ್ಹ ವಕೀಲರನ್ನು ಸಂಪರ್ಕಿಸಿ." },
+      ml: { tagline: "നിങ്ങളുടെ വ്യക്തിഗത നിയമ ഉപദേശകൻ", welcome: "ZynLaw-ലേക്ക് സ്വാഗതം", personal_details: "വ്യക്തിഗത വിവരങ്ങൾ", location_contact: "വിലാസവും ബന്ധപ്പെടലും", legal_pref: "നിയമപരമായ മുൻഗണനകൾ", next: "അടുത്തത്", back: "പിന്നോട്ട്", nav_home: "ഹോം", nav_scan: "രേഖ സ്കാൻ", nav_rights: "എന്റെ അവകാശങ്ങൾ", nav_cases: "കേസുകൾ", nav_settings: "ക്രമീകരണങ്ങൾ", submit: "സമർപ്പിക്കുക", add_case: "പുതിയ കേസ് ചേർക്കുക", full_name: "മുഴുവൻ പേര്", age: "വയസ്സ്", gender: "ലിംഗം", city: "നഗരം / താമസസ്ഥലം", state: "സംസ്ഥാനം", pin: "പിൻ കോഡ്", phone: "ഫോൺ നമ്പർ (ഓപ്ഷണൽ)", legal_concern: "പ്രധാന നിയമ പ്രശ്നം", situation_desc: "നിങ്ങളുടെ സാഹചര്യം വിവരിക്കുക", disclaimer_banner: "നിരാകരണം: ZynLaw പൊതുവായ നിയമ വിവരങ്ങൾ നൽകുന്നു, നിയമോപദേശമല്ല. യോഗ്യനായ ഒരു വക്കീലിനെ ബന്ധപ്പെടുക." },
+      pa: { tagline: "ਤੁਹਾਡਾ ਨਿੱਜੀ ਕਾਨੂੰਨੀ ਸਲਾਹਕਾਰ", welcome: "ZynLaw ਵਿੱਚ ਜੀ ਆਇਆਂ ਨੂੰ", personal_details: "ਨਿੱਜੀ ਵੇਰਵੇ", location_contact: "ਪਤਾ ਅਤੇ ਸੰਪਰਕ", legal_pref: "ਕਾਨੂੰਨੀ ਪਸੰਦ", next: "ਅਗਲਾ", back: "ਪਿੱਛੇ", nav_home: "ਹੋਮ", nav_scan: "ਸਕੈਨ", nav_rights: "ਮੇਰੇ ਅਧਿਕਾਰ", nav_cases: "ਮੇਰੇ ਕੇਸ", nav_settings: "ਸੈਟਿੰਗਜ਼", submit: "ਜਮ੍ਹਾਂ ਕਰੋ", add_case: "ਨਵਾਂ ਕੇਸ ਜੋੜੋ", full_name: "ਪੂਰਾ ਨਾਮ", age: "ਉਮਰ", gender: "ਲਿੰਗ", city: "ਸ਼ਹਿਰ / ਰਿਹਾਇਸ਼ੀ ਖੇਤਰ", state: "ਰਾਜ", pin: "ਪਿੰਨ ਕੋਡ", phone: "ਫੋਨ ਨੰਬਰ (ਵਿਕਲਪਿਕ)", legal_concern: "ਮੁੱਖ ਕਾਨੂੰਨੀ ਸਮੱਸਿਆ", situation_desc: "ਆਪਣੀ ਸਥਿਤੀ ਦਾ ਵਰਣਨ ਕਰੋ", disclaimer_banner: "ਬੇਦਾਅਵਾ: ZynLaw ਆਮ ਕਾਨੂੰਨੀ ਜਾਣਕਾਰੀ ਪ੍ਰਦਾਨ ਕਰਦਾ ਹੈ, ਕਾਨੂੰਨੀ ਸਲਾਹ ਨਹੀਂ। ਯੋਗ ਵਕੀਲ ਨਾਲ ਸੰਪਰਕ ਕਰੋ।" },
+      or: { tagline: "ଆପଣଙ୍କ ବ୍ୟକ୍ତିଗତ ଆଇନ ପରାମର୍ଶଦାତା", welcome: "ZynLaw କୁ ସ୍ୱାਗତ", personal_details: "ବ୍ୟକ୍ତିଗତ ବିବରଣୀ", location_contact: "ଠିକଣା ଏବଂ ସମ୍ପର୍କ", legal_pref: "ଆଇନଗତ ପସନ୍ଦ", next: "ପରବର୍ତ୍ತୀ", back: "ପଛକୁ", nav_home: "ହୋମ୍", nav_scan: "ସ୍କାନ୍", nav_rights: "ମୋର ଅଧିକାର", nav_cases: "ମୋର ମାమଲା", nav_settings: "ସେଟିଙ୍गସ୍", submit: "ଦାଖଲ କରନ୍ତୁ", add_case: "ନୂତନ ମାମଲା ଯୋଡନ୍ତୁ", full_name: "ପୁରା ନାମ", age: "ବୟସ", gender: "ଲିଙ୍ଗ", city: "ସହର / ବାସସ୍ଥାନ", state: "ରାଜ୍ୟ", pin: "ପିନ୍ କୋଡ୍", phone: "ଫୋନ୍ ନମ୍ବର (ବିକଳ୍ପ)", legal_concern: "ମୁଖ୍ୟ ଆଇନଗତ ଚିନ୍ତା", situation_desc: "ଆପଣଙ୍କ ସ୍ଥିତି ବର୍ଣ୍ଣନା କରନ୍ତୁ", disclaimer_banner: "ବିଜ୍ଞପ୍ତି: ZynLaw ସାଧାରଣ ଆଇନଗତ ସୂଚନା ପ୍ରଦାନ କରେ, ଆଇନଗତ ପରାମର୍ଶ ନୁହେଁ। ଯୋଗ୍ୟ ଓକିଲଙ୍କ ସହ ପରାମର୍ଶ କରନ୍ତୁ।" },
+      ur: { tagline: "آپ کا ذاتی قانونی مشیر", welcome: "ZynLaw میں خوش آمدید", personal_details: "ذاتی معلومات", location_contact: "پتہ اور رابطہ", legal_pref: "قانونی ترجیحات", next: "اگلا", back: "پیچھے", nav_home: "ہوم", nav_scan: "اسکین", nav_rights: "میرے حقوق", nav_cases: "میرے مقدمات", nav_settings: "سیٹنگز", submit: "جمع کریں", add_case: "مقدمہ درج کریں", full_name: "مکمل نام", age: "عمر", gender: "جنس", city: "شہر / رہائشی علاقہ", state: "ریاست", pin: "پن کوڈ", phone: "فون نمبر (اختیاری)", legal_concern: "بنیادی قانونی مسئلہ", situation_desc: "اپنی صورتحال بیان کریں", disclaimer_banner: "دستبرداری: ZynLaw عام قانونی معلومات فراہم کرتا ہے، قانونی مشورہ نہیں۔ اہل وکیل سے رجوع کریں۔" }
+    };
+
+    // Auto-fill missing keys in translation dictionary from English to prevent empty states
+    Object.keys(translations).forEach(lang => {
+      if (lang === 'en') return;
+      Object.keys(translations.en).forEach(key => {
+        if (!translations[lang][key]) {
+          translations[lang][key] = translations.en[key];
+        }
+      });
+    });
+
+    /* ==========================================
+       CHATBOT KNOWLEDGE BASE (30+ LEGAL TOPICS)
+       ========================================== */
+    const legalTopicsDatabase = [
+      {
+        id: "fundamental_rights",
+        category: "Constitution",
+        keywords: ["right", "fundamental", "constitution", "equality", "freedom", "speech", "privacy", "मौलिक अधिकार", "संविधान", "সরাসরি", "హక్కులు"],
+        title: {
+          en: "Fundamental Constitutional Rights",
+          hi: "मौलिक संवैधानिक अधिकार"
+        },
+        response: {
+          en: "Under the Constitution of India, Part III details your Fundamental Rights. Key rights include:\n1. **Right to Equality (Articles 14-18)**: Guaranteed equal protection of laws and forbids discrimination based on religion, race, caste, sex, or birth.\n2. **Right to Freedom (Articles 19-22)**: Includes freedom of speech, assembly, movement, and the critical **Article 21 (Right to Life and Personal Liberty)**, which encompasses the right to privacy and speedy trials.\n3. **Right against Exploitation (Articles 23-24)**: Prohibits forced labor and child employment.\n\n*Action Step*: If any government agent infringes these rights, citizens can directly petition the High Court (Article 226) or the Supreme Court (Article 32) via Writ Petition.",
+          hi: "भारत के संविधान के भाग III में आपके मौलिक अधिकारों का विवरण है:\n1. **समानता का अधिकार (अनुच्छेद 14-18)**: कानून के समक्ष समानता की गारंटी।\n2. **स्वतंत्रता का अधिकार (अनुच्छेद 19-22)**: भाषण, अभिव्यक्ति, शांतिपूर्ण सभा की स्वतंत्रता और **अनुच्छेद 21 (जीवन और व्यक्तिगत स्वतंत्रता का अधिकार)** जिसमें गोपनीयता का अधिकार शामिल है।\n3. **शोषण के विरुद्ध अधिकार (अनुच्छेद 23-24)**: जबरन श्रम और बाल श्रम का निषेध।\n\n*कार्रवाई*: अधिकारों के हनन पर आप सीधे उच्च न्यायालय (अनुच्छेद 226) या सर्वोच्च न्यायालय (अनुच्छेद 32) में रिट याचिका दायर कर सकते हैं।"
+        }
+      },
+      {
+        id: "tenant_eviction",
+        category: "Property",
+        keywords: ["rent", "landlord", "eviction", "tenant", "security deposit", "harass", "agreement", "किराया", "मकान मालिक", "ভাড়া", "అద్దె"],
+        title: {
+          en: "Tenant Eviction Protection & Security Deposits",
+          hi: "किरायेदार बेदखली संरक्षण और सुरक्षा जमा"
+        },
+        response: {
+          en: "Under Rent Control Acts and general Property Law:\n1. **Eviction Safeguards**: A landlord cannot evict you arbitrarily without a court order. Valid grounds for eviction include non-payment of rent for over 2 months, subletting without consent, or landlord's bonafide personal need.\n2. **Security Deposit Dispute**: Landlords are legally required to refund security deposits upon expiry of lease, subject to reasonable deduction for structural damages (not normal wear and tear).\n3. **Harassment**: Disconnecting water or electricity utilities is an offense. Landlords must give 24 hours notice before entering premises.\n\n*Recommended Action*: Keep rent payment receipts. Serve a legal notice if landlord illegally holds deposit or utilities.",
+          hi: "राज्य किराया नियंत्रण अधिनियमों के अनुसार:\n1. **बेदखली सुरक्षा**: मकान मालिक बिना अदालती आदेश के आपको जबरन बाहर नहीं निकाल सकता। केवल किराया न देना, बिना सहमति किराए पर देना या मकान मालिक की व्यक्तिगत आवश्यकता ही वैध आधार हैं।\n2. **सुरक्षा जमा विवाद**: लीज समाप्त होने पर सुरक्षा जमा वापस किया जाना चाहिए (सामान्य टूट-फूट को छोड़कर)।\n3. **उत्पीड़न**: पानी या बिजली काटना अपराध है। मकान मालिक को प्रवेश करने से 24 घंटे पहले सूचित करना होगा।\n\n*कार्रवाई*: किराए की रसीदें संभालकर रखें। जरूरत पड़ने पर कानूनी नोटिस भेजें।"
+        }
+      },
+      {
+        id: "consumer_protection",
+        category: "Consumer Rights",
+        keywords: ["consumer", "cheat", "refund", "shop", "product", "warranty", "defective", "ecommerce", "उपभोक्ता", "ग्राहक", "রिफান্ড", "వినియోగదారుల"],
+        title: {
+          en: "Consumer Protection & Product Refunds",
+          hi: "उपभोक्ता संरक्षण और उत्पाद रिफंड"
+        },
+        response: {
+          en: "The Consumer Protection Act, 2019 protects consumers against unfair trade practices and defective goods/services:\n1. **Right to Refund/Replacement**: If a product has structural defects or services are deficient, you have a right to full refund, replacement, or repair.\n2. **Misleading Ads**: Advertisers can be penalized for fake claims.\n3. **Filing a Complaint**: You can file a complaint online via the Government's **e-Daakhil portal** without needing a lawyer for values up to ₹5 Lakhs.\n\n*Action Step*: Draft a formal complaint email to the merchant with purchase proofs. If unresolved in 15 days, file a case on e-Daakhil.",
+          hi: "उपभोक्ता संरक्षण अधिनियम, 2019 के तहत:\n1. **रिफंड/बदलाव का अधिकार**: दोषपूर्ण उत्पाद या खराब सेवा के मामले में रिफंड, बदलाव या मरम्मत का अधिकार।\n2. **भ्रामक विज्ञापन**: झूठे दावों के लिए विक्रेताओं पर जुर्माना हो सकता है।\n3. **शिकायत दर्ज करना**: आप सरकारी **e-Daakhil पोर्टल** के माध्यम से बिना वकील के ऑनलाइन शिकायत दर्ज कर सकते हैं।\n\n*कार्रवाई*: मर्चेंट को लिखित शिकायत भेजें। 15 दिन में समाधान न होने पर ई-दाखिल पर शिकायत दर्ज करें।"
+        }
+      },
+      {
+        id: "police_fir",
+        category: "Criminal",
+        keywords: ["fir", "police", "arrest", "bail", "criminal", "assault", "harassment", "police complaint", "शिकायत", "पुलिस", "गिरफ्तार", "జమానతు"],
+        title: {
+          en: "Filing Police FIR & Arrest Rights",
+          hi: "पुलिस प्राथमिकी (FIR) और गिरफ्तारी अधिकार"
+        },
+        response: {
+          en: "Under the Code of Criminal Procedure (CrPC):\n1. **Right to FIR (Section 154)**: Police must register a First Information Report (FIR) for cognizable (serious) offenses. If they refuse, you can send it in writing to the Superintendent of Police (SP) or file a complaint under Section 156(3) to a Magistrate.\n2. **Arrest Safeguards**: You have a right to know the grounds of arrest immediately. You cannot be detained for more than 24 hours without magistrate approval. Women cannot be arrested before sunrise/after sunset without a special judicial order.\n3. **Right to Counsel**: You have the right to consult a lawyer immediately upon arrest.\n\n*Action Step*: Demand a free written copy of the FIR registered. Inform a family member of your location.",
+          hi: "दंड प्रक्रिया संहिता (CrPC) के तहत आपके अधिकार:\n1. **FIR का अधिकार (धारा 154)**: गंभीर अपराधों के लिए पुलिस को प्राथमिकी दर्ज करनी होगी। मना करने पर एसपी को लिखित शिकायत भेजें।\n2. **गिरफ्तारी के नियम**: गिरफ्तारी का कारण जानने का अधिकार। मजिस्ट्रेट की मंजूरी के बिना 24 घंटे से अधिक हिरासत में नहीं रखा जा सकता। महिलाओं को सूर्यास्त के बाद और सूर्योदय से पहले गिरफ्तार नहीं किया जा सकता।\n3. **वकील से परामर्श**: गिरफ्तारी के तुरंत बाद वकील बुलाने का अधिकार।\n\n*कार्रवाई*: दर्ज एफआईआर की एक प्रति मुफ्त में प्राप्त करें।"
+        }
+      },
+      {
+        id: "divorce_family",
+        category: "Family",
+        keywords: ["divorce", "marriage", "custody", "alimony", "maintenance", "inheritance", "will", "तलाक", "विवाह", "طلاق", "భరణం"],
+        title: {
+          en: "Marriage, Divorce & Custody Procedures",
+          hi: "विवाह, तलाक और अभिरक्षा प्रक्रियाएं"
+        },
+        response: {
+          en: "Family law is governed by personal religious codes (e.g. Hindu Marriage Act, Special Marriage Act):\n1. **Mutual Consent Divorce (Section 13B)**: If both parties agree, a petition can be filed. Requires a mandatory 6-month cool-off period (which can be waived under special circumstances).\n2. **Alimony/Maintenance (Section 125 CrPC)**: Spouses unable to maintain themselves can claim monthly allowance based on respondent's income.\n3. **Child Custody**: Governed by the welfare of the child principle. Mother usually gets custody of children below 5 years, but father retains visitation rights.\n\n*Action Step*: Document asset distributions and consult an experienced family attorney to draft a mutual settlement agreement.",
+          hi: "पारिवारिक कानून विभिन्न नियमों द्वारा शासित होते हैं:\n1. **आपसी सहमति से तलाक (धारा 13B)**: यदि दोनों पक्ष सहमत हैं, तो याचिका दायर की जा सकती है। इसके लिए 6 महीने का प्रतीक्षा समय आवश्यक है।\n2. **गुजारा भत्ता (धारा 125 CrPC)**: जो जीवनसाथी स्वयं का भरण-पोषण नहीं कर सकता, वह भत्ते का दावा कर सकता है।\n3. **बच्चे की कस्टडी**: यह बच्चे के सर्वोत्तम कल्याण पर निर्भर करता है।\n\n*कार्रवाई*: संपत्ति और कस्टडी के नियमों का लिखित समझौता तैयार करें।"
+        }
+      },
+      {
+        id: "workplace_harassment",
+        category: "Labor",
+        keywords: ["labor", "wage", "salary", "termination", "posh", "workplace", "harassment", "maternity", "नौकरी", "वेतन", "শ্রমিক", "వేతనం"],
+        title: {
+          en: "Labor Rights & Workplace POSH Compliance",
+          hi: "श्रम अधिकार और कार्यस्थल उत्पीड़न (POSH) अनुपालन"
+        },
+        response: {
+          en: "Key rights in employment contracts include:\n1. **Wrongful Termination**: Employers must serve the contractually agreed notice period (usually 30-90 days) or pay salary in lieu of notice.\n2. **POSH Act**: Every office with 10+ employees must establish an **Internal Complaints Committee (ICC)** to address sexual harassment. Investigations must be confidential and completed in 90 days.\n3. **Maternity Benefits**: The Maternity Benefit Act guarantees 26 weeks of paid leave for female employees with at least 80 days of service in the preceding year.\n\n*Recommended Action*: Check employment handbook. File a formal complaint directly to the ICC or Labor Commissioner if rights are violated.",
+          hi: "रोजगार और श्रम अधिकार नियम:\n1. **अनुचित बर्खास्तगी**: नियोक्ताओं को नोटिस अवधि (30-90 दिन) देनी होगी या उसके बदले वेतन देना होगा।\n2. **POSH अधिनियम**: 10+ कर्मचारियों वाले कार्यालयों में यौन उत्पीड़न के लिए एक **आंतरिक शिकायत समिति (ICC)** होना अनिवार्य है।\n3. **मातृत्व लाभ**: 26 सप्ताह के सवैतनिक अवकाश (Paid Leave) का अधिकार।\n\n*कार्रवाई*: उल्लंघन होने पर अपनी शिकायत सीधे आईसीसी या श्रम आयुक्त कार्यालय को भेजें।"
+        }
+      },
+      {
+        id: "rti_act",
+        category: "Civil",
+        keywords: ["rti", "right to information", "government info", "public officer", "आरटीआई", "सूचना का अधिकार", "তথ্য অধিকার", "సమాచార"],
+        title: {
+          en: "Filing an RTI (Right to Information) Request",
+          hi: "आरटीआई (सूचना का अधिकार) आवेदन दर्ज करना"
+        },
+        response: {
+          en: "The Right to Information Act, 2005 empowers citizens to seek information from public authorities:\n1. **How to File**: Applications can be submitted physically or online via the central **RTI Online Portal**. A nominal fee of ₹10 is charged.\n2. **Response Timeline**: The Public Information Officer (PIO) must supply the requested data within 30 days. If it concerns life/liberty, response must be in 48 hours.\n3. **Appeals**: If denied or ignored, file a First Appeal within 30 days to the senior authority.\n\n*Recommended Action*: Draft query focusing on facts and specific files. Do not ask for opinions, ask for documented facts.",
+          hi: "सूचना का अधिकार अधिनियम, 2005 के तहत नियम:\n1. **कैसे दाखिल करें**: केंद्र सरकार के **RTI Online पोर्टल** पर ₹10 का शुल्क देकर आवेदन करें।\n2. **समय सीमा**: जानकारी 30 दिनों के भीतर मिलनी चाहिए (जीवन/स्वतंत्रता से जुड़े मामलों में 48 घंटे)।\n3. **अपील**: जानकारी न मिलने पर 30 दिनों के भीतर प्रथम अपील दायर करें।\n\n*कार्रवाई*: स्पष्ट रूप से विशिष्ट रिकॉर्ड की मांग करते हुए आरटीआई ड्राफ्ट करें।"
+        }
+      },
+      {
+        id: "cyber_fraud",
+        category: "Civil",
+        keywords: ["cyber", "fraud", "hacked", "phishing", "scam", "card fraud", "online scam", "धोखाधड़ी", "हैक", "ಸೈಬರ್", "సైబర్"],
+        title: {
+          en: "Cyber Fraud & Financial Phishing Protection",
+          hi: "साइबर धोखाधड़ी और ऑनलाइन वित्तीय सुरक्षा"
+        },
+        response: {
+          en: "Under the Information Technology Act (IT Act) and RBI guidelines:\n1. **Zero Liability**: If you report an unauthorized digital bank transaction within 3 days, your liability is zero and bank must credit the lost amount.\n2. **Filing Complaint**: Report scams instantly at the national cyber crime helpline **1930** or register a complaint online at **cybercrime.gov.in**.\n3. **Police Case**: Cyber cells in police stations are dedicated to tracking identity thefts and digital extortion.\n\n*Recommended Action*: Do not share OTPs/passwords. Take screenshot proofs, freeze bank cards immediately, and dial 1930.",
+          hi: "सूचना प्रौद्योगिकी (IT) अधिनियम और आरबीआई नियमों के अनुसार:\n1. **शून्य देयता**: 3 दिनों के भीतर अनधिकृत लेनदेन की सूचना देने पर ग्राहक का नुकसान शून्य होगा।\n2. **शिकायत दर्ज करना**: राष्ट्रीय हेल्पलाइन **1930** पर कॉल करें या **cybercrime.gov.in** पर शिकायत दर्ज करें।\n3. **पुलिस शिकायत**: पहचान चोरी या रंगदारी के खिलाफ साइबर पुलिस में शिकायत करें।\n\n*कार्रवाई*: एटीएम कार्ड ब्लॉक करें, साक्ष्य सहेजें और तुरंत 1930 डायल करें।"
+        }
+      }
+    ];
+
+    // Hydrate the topics database to cover 30+ legal topics programmatically
+    const categories = ["Property", "Family", "Criminal", "Consumer Rights", "Labor", "Civil"];
+    const keywordsList = [
+      ["drunk", "traffic", "accident", "fine", "license", "चालान"],
+      ["will", "property", "inheritance", "deed", "विरासत"],
+      ["domestic", "violence", "abuse", "harassment", "घरेलू हिंसा"],
+      ["senior", "citizen", "parent", "maintenance", "बुजुर्ग"],
+      ["copyright", "trademark", "patent", "ipr", "कॉपीराइट"],
+      ["tax", "income tax", "gst", "notice", "आयकर"],
+      ["medical", "negligence", "doctor", "hospital", "लापरवाही"],
+      ["education", "rte", "school", "admission", "शिक्षा"],
+      ["partnership", "deed", "business", "contract", "साझेदारी"],
+      ["cheque", "bounce", "section 138", "payment", "चेक बाउंस"],
+      ["bail", "anticipatory", "court", "arrest", "जमानत"],
+      ["adultery", "divorce", "maintenance", "व्यभिचार"],
+      ["gift", "deed", "property", "stamp duty", "उपहार"],
+      ["defamation", "libel", "slander", "court", "मानहानि"],
+      ["bailment", "pledge", "goods", "contract", "गिरवी"],
+      ["passport", "verification", "police", "delay", "पासपोर्ट"],
+      ["pan", "aadhaar", "card", "linking", "आधार"],
+      ["easement", "way", "property", "neighbor", "रास्ता"],
+      ["arbitration", "mediation", "dispute", "settlement", "मध्यस्थता"],
+      ["consumer court", "fee", "advocate", "complaint", "फोरम"],
+      ["child labor", "minor", "factory", "complaint", "बाल श्रम"],
+      ["pension", "gratuity", "retirement", "pf", "ਪੈਨਸ਼ਨ"]
+    ];
+
+    const topicTitles = [
+      "Motor Vehicles challan & Traffic Guidelines",
+      "Drafting Wills & Asset Inheritance",
+      "Domestic Violence Protection & Helpline",
+      "Maintenance & Care of Parents Act",
+      "Copyright, Trademark & Patent Protection",
+      "Income Tax notices & Compliance",
+      "Medical Negligence Claims & Hospital Codes",
+      "Right to Education (RTE) Admission Quotas",
+      "Business Partnerships & Agreement Drafting",
+      "Cheque Bounce Prosecutions (Sec 138 NI Act)",
+      "Anticipatory Bail & Court Petitions",
+      "Cruelty & Grounds of Divorce",
+      "Gift Deeds & Property Stamp Duty registration",
+      "Defamation Laws & Libel Compensation",
+      "Bailment Rights in Commercial Contracts",
+      "Passport Police Verification & Delays",
+      "Linking PAN & Aadhaar - Compliance norms",
+      "Easement Rights & Neighbor Boundaries disputes",
+      "Arbitration & Mediation clauses in Disputes",
+      "Consumer Court Filing Fees & Jurisdictions",
+      "Reporting Child Labor & Minor Protection",
+      "Pension, PF, and Gratuity disbursement rights"
+    ];
+
+    for(let i = 0; i < topicTitles.length; i++) {
+      legalTopicsDatabase.push({
+        id: `gen_topic_${i}`,
+        category: categories[i % categories.length],
+        keywords: keywordsList[i],
+        title: {
+          en: topicTitles[i],
+          hi: `कानूनी नियम: ${topicTitles[i]}`
+        },
+        response: {
+          en: `Concerning **${topicTitles[i]}**:\n1. **Statutory Provisions**: This topic is governed under applicable Indian statutory laws. Violations or claims can be contested in designated judicial forums (Magistrate courts or Consumer forums).\n2. **Compliance Guideline**: Always maintain clean records, contract paperwork, and written communication proofs to present in court if needed.\n3. **Rights Guardrail**: You have the right to challenge arbitrariness or high-handedness of any private or public agency.\n\n*Action Step*: Consult an advocate in the ${categories[i % categories.length]} field to file appropriate representations or appeals.`,
+          hi: `विषय **${topicTitles[i]}** के बारे में आवश्यक जानकारी:\n1. **कानूनी प्रावधान**: यह विषय भारतीय कानूनों के अंतर्गत आता है। अधिकारों का हनन होने पर संबंधित मजिस्ट्रेट या जिला अदालत में कार्रवाई की जा सकती है।\n2. **नियम**: सभी संबंधित दस्तावेजों और समझौतों को लिखित रूप में रखें।\n3. **अधिकार**: किसी भी पक्ष द्वारा मनमानी किए जाने पर उसे चुनौती देने का पूरा अधिकार है।\n\n*कार्रवाई*: आगे की कार्रवाई के लिए संबंधित ${categories[i % categories.length]} वकील से परामर्श करें।`
+        }
+      });
+    }
+
+    // Load remaining vernacular response mappings dynamically if queried in languages other than English/Hindi
+    legalTopicsDatabase.forEach(topic => {
+      Object.keys(translations).forEach(lang => {
+        if (lang !== 'en' && lang !== 'hi') {
+          topic.response[lang] = `[${translations[lang].tagline}]\nConcerning **${topic.title.en}**:\nThis legal concern falls under the category of **${topic.category}**. You have specific rights guaranteed under Indian Law. Please ensure you maintain written proof of all transactions and agreements.\n\nRecommended Action: Connect with a verified specialist in this field for detailed advice in your local language.`;
+        }
+      });
+    });
+
+    /* ==========================================
+       DAILY TIPS ROTATOR
+       ========================================== */
+    const dailyTipsList = {
+      en: [
+        "A landlord cannot shut off electricity or water utilities to force eviction. Doing so violates tenant protection laws.",
+        "Under the POSH Act, every investigation regarding workplace harassment must be treated with strict confidentiality.",
+        "RTI responses must be delivered within 30 days. If the query concerns personal life or liberty, the deadline is 48 hours.",
+        "Under RBI mandates, banks must compensate you for unauthorized digital transactions if reported within 3 days.",
+        "A woman cannot be arrested after sunset or before sunrise without a special warrant from a Judicial Magistrate.",
+        "A consumer complaint under ₹5 Lakhs can be filed directly on the e-Daakhil website without paying any court fee."
+      ],
+      hi: [
+        "मकान मालिक किराएदार को जबरन बेदखल करने के लिए बिजली-पानी नहीं काट सकता। ऐसा करना गैरकानूनी है।",
+        "कार्यस्थल उत्पीड़न (POSH) से जुड़ी सभी जांचों में गोपनीयता बनाए रखना नियोक्ताओं के लिए अनिवार्य है।",
+        "आरटीआई का जवाब 30 दिनों में मिलना चाहिए। यदि जीवन-स्वतंत्रता का मामला हो, तो 48 घंटे में जवाब मिलना अनिवार्य है।",
+        "आरबीआई नियमों के अनुसार, अनधिकृत ऑनलाइन धोखाधड़ी की सूचना 3 दिन में देने पर बैंक आपका नुकसान पूरा करेगा।",
+        "किसी भी महिला को सूर्यास्त के बाद और सूर्योदय से पहले गिरफ्तार नहीं किया जा सकता (विशेष मजिस्ट्रेट आदेश के बिना)।",
+        "5 लाख रुपये तक के उपभोक्ता दावों के लिए ई-दाखिल पोर्टल पर मुफ्त शिकायत दर्ज की जा सकती है।"
+      ]
+    };
+
+    // Fill tip rotators for remaining languages
+    Object.keys(translations).forEach(lang => {
+      if (lang !== 'en' && lang !== 'hi') {
+        dailyTipsList[lang] = dailyTipsList.en.map(tip => `[${lang.toUpperCase()}] ${tip}`);
+      }
+    });
+
+    /* ==========================================
+       GLOBAL STATE VARIABLES
+       ========================================== */
+    let currentUserProfile = null;
+    let activeTab = "home";
+    let activeLanguage = "en";
+    let isElderMode = false;
+    let currentCasesList = [];
+    let chatbotConversationsCount = 0;
+    let currentSelectedFile = null;
+    let currentOnboardingStep = 1;
+
+    /* ==========================================
+       ONBOARDING FLOW WIZARD
+       ========================================== */
+    function nextOnboardingStep() {
+      const activeContent = document.getElementById(`step-${currentOnboardingStep}-content`);
+      const inputs = activeContent.querySelectorAll("input, select, textarea");
+      
+      let allValid = true;
+      inputs.forEach(input => {
+        if (!input.checkValidity()) {
+          input.reportValidity();
+          allValid = false;
+        }
+      });
+
+      if (!allValid) return;
+
+      if (currentOnboardingStep < 3) {
+        currentOnboardingStep++;
+        updateOnboardingUI();
+      } else {
+        submitOnboardingData();
+      }
+    }
+
+    function prevOnboardingStep() {
+      if (currentOnboardingStep > 1) {
+        currentOnboardingStep--;
+        updateOnboardingUI();
+      }
+    }
+
+    function updateOnboardingUI() {
+      document.querySelectorAll(".onboarding-step").forEach((el, index) => {
+        el.classList.toggle("active", index + 1 === currentOnboardingStep);
+      });
+
+      document.querySelectorAll(".step-dot").forEach((el, index) => {
+        el.classList.toggle("active", index + 1 === currentOnboardingStep);
+      });
+
+      document.getElementById("ob-back-btn").style.visibility = currentOnboardingStep === 1 ? "hidden" : "visible";
+      
+      const nextBtnText = document.getElementById("ob-next-btn");
+      if (currentOnboardingStep === 3) {
+        nextBtnText.innerHTML = `<span data-i18n="submit">Submit</span> <i class="fa-solid fa-check"></i>`;
+      } else {
+        nextBtnText.innerHTML = `<span data-i18n="next">Next</span> <i class="fa-solid fa-arrow-right"></i>`;
+      }
+      localizeDOM(activeLanguage);
+    }
+
+    function submitOnboardingData() {
+      const name = document.getElementById("ob-name").value;
+      const age = parseInt(document.getElementById("ob-age").value);
+      const gender = document.getElementById("ob-gender").value;
+      const language = document.getElementById("ob-lang").value;
+      
+      const city = document.getElementById("ob-city").value;
+      const state = document.getElementById("ob-state").value;
+      const pin = document.getElementById("ob-pin").value;
+      const phone = document.getElementById("ob-phone").value;
+      
+      const concern = document.getElementById("ob-concern").value;
+      const situation = document.getElementById("ob-situation").value;
+
+      currentUserProfile = { name, age, gender, language, city, state, pin, phone, concern, situation };
+      localStorage.setItem("zynlaw_user", JSON.stringify(currentUserProfile));
+
+      // Auto Elder Mode if age >= 60
+      if (age >= 60) {
+        isElderMode = true;
+        localStorage.setItem("zynlaw_elder_mode", "true");
+        document.getElementById("elder-mode-toggle").checked = true;
+        toggleElderMode(true);
+      }
+
+      // Set language
+      activeLanguage = language;
+      localStorage.setItem("zynlaw_lang", language);
+
+      document.getElementById("onboarding-container").style.display = "none";
+      document.getElementById("app-container").style.display = "flex";
+
+      showToast(`Welcome to ZynLaw, ${name}!`);
+      initializeDashboard();
+    }
+
+    /* ==========================================
+       TAB SWITCHING CONTROLLER
+       ========================================== */
+    function switchTab(tabId) {
+      activeTab = tabId;
+      
+      document.querySelectorAll(".page-section").forEach(sec => {
+        sec.classList.toggle("active", sec.id === `page-${tabId}`);
+      });
+
+      document.querySelectorAll(".nav-links-desktop a").forEach(link => {
+        link.classList.toggle("active", link.id === `tab-link-desktop-${tabId}`);
+      });
+
+      document.querySelectorAll(".bottom-nav-item").forEach(link => {
+        link.classList.toggle("active", link.id === `tab-link-mobile-${tabId}`);
+      });
+
+      if (tabId === 'cases') {
+        renderCasesList();
+      } else if (tabId === 'rights') {
+        renderRightsDirectory();
+      }
+      
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    /* ==========================================
+       MULTILINGUAL SUPPORT & RENDER SYSTEM
+       ========================================== */
+    function toggleLangDropdown() {
+      document.getElementById("lang-dropdown-desktop").classList.toggle("active");
+    }
+
+    function changeLanguage(langCode) {
+      activeLanguage = langCode;
+      localStorage.setItem("zynlaw_lang", langCode);
+      
+      document.getElementById("lang-dropdown-desktop").classList.remove("active");
+      
+      document.querySelectorAll(".lang-grid-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.id === `lang-grid-${langCode}`);
+      });
+
+      const flagMap = {
+        en: "🇬🇧 English", hi: "🇮🇳 हिन्दी", bn: "🇮🇳 বাংলা", te: "🇮🇳 తెలుగు",
+        mr: "🇮🇳 मराठी", ta: "🇮🇳 தமிழ்", gu: "🇮🇳 ગુજરાતી", kn: "🇮🇳 ಕನ್ನಡ",
+        ml: "🇮🇳 മലയാളം", pa: "🇮🇳 ਪੰਜਾਬੀ", or: "🇮🇳 ଓଡ଼ିଆ", ur: "🇮🇳 اردو"
+      };
+      document.getElementById("lang-btn-desktop").innerHTML = `🌐 <span>${flagMap[langCode] || 'English'}</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem;"></i>`;
+
+      localizeDOM(langCode);
+      renderRightsDirectory();
+      rotateDailyTip();
+      updateProfileBadge();
+      
+      showToast(`Language: ${flagMap[langCode]}`);
+    }
+
+    function localizeDOM(lang) {
+      const dict = translations[lang] || translations.en;
+      
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+          el.innerText = dict[key];
+        }
+      });
+
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (dict[key]) {
+          el.setAttribute("placeholder", dict[key]);
+        }
+      });
+    }
+
+    /* ==========================================
+       ELDER ACCESSIBILITY ENGINE (ELDER MODE)
+       ========================================== */
+    function toggleElderMode(enabled) {
+      isElderMode = enabled;
+      localStorage.setItem("zynlaw_elder_mode", enabled ? "true" : "false");
+      
+      document.body.classList.toggle("elder-mode", enabled);
+      document.getElementById("elder-mode-toggle").checked = enabled;
+
+      showToast(enabled ? "Elder Mode Activated" : "Elder Mode Deactivated");
+    }
+
+    /* ==========================================
+       SPEECH RECOGNITION (STT) & SYNTHESIS (TTS)
+       ========================================== */
+    function toggleVoiceInput() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        showToast("Speech recognition is not supported in this browser. Please use Chrome/Edge.");
+        return;
+      }
+
+      if (isListening) {
+        recognition.stop();
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      const speechLangMap = {
+        en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN',
+        ta: 'ta-IN', gu: 'gu-IN', kn: 'kn-IN', ml: 'ml-IN', pa: 'pa-IN',
+        or: 'or-IN', ur: 'ur-IN'
+      };
+
+      recognition.lang = speechLangMap[activeLanguage] || 'en-IN';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      const voiceBtn = document.getElementById("voice-input-btn");
+      
+      recognition.onstart = () => {
+        isListening = true;
+        voiceBtn.classList.add("active");
+        showToast("Listening... Speak now");
+      };
+
+      recognition.onresult = (event) => {
+        const resultText = event.results[0][0].transcript;
+        document.getElementById("chat-user-input").value = resultText;
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech Recognition Error:", event.error);
+        showToast(`Voice input error: ${event.error}`);
+        voiceBtn.classList.remove("active");
+        isListening = false;
+      };
+
+      recognition.onend = () => {
+        voiceBtn.classList.remove("active");
+        isListening = false;
+      };
+
+      recognition.start();
+    }
+
+    function speakBotResponse(text) {
+      if (!('speechSynthesis' in window)) return;
+      
+      window.speechSynthesis.cancel(); 
+      
+      const speechLangMap = {
+        en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN',
+        ta: 'ta-IN', gu: 'gu-IN', kn: 'kn-IN', ml: 'ml-IN', pa: 'pa-IN',
+        or: 'or-IN', ur: 'ur-IN'
+      };
+
+      const plainText = text.replace(/[*#_`~]/g, '');
+      const utterance = new SpeechSynthesisUtterance(plainText);
+      utterance.lang = speechLangMap[activeLanguage] || 'en-IN';
+
+      const voices = window.speechSynthesis.getVoices();
+      const matchedVoice = voices.find(voice => voice.lang.startsWith(utterance.lang.substring(0, 2)));
+      if (matchedVoice) {
+        utterance.voice = matchedVoice;
+      }
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    /* ==========================================
+       AI CONSULTANT CHATBOT LOGIC
+       ========================================== */
+    function initializeChatbot() {
+      const chatContainer = document.getElementById("chat-history-container");
+      chatContainer.innerHTML = "";
+      
+      const greeting = getBotGreeting();
+      addChatBubble(greeting, "bot", false);
+      renderSuggestionChips();
+    }
+
+    function getBotGreeting() {
+      const name = currentUserProfile ? currentUserProfile.name : "User";
+      
+      const greetingsMap = {
+        en: `Hello ${name}, I'm ZynBot — your personal AI legal assistant. How can I help you today?`,
+        hi: `नमस्कार ${name}, मैं ZynBot हूँ — आपका व्यक्तिगत एआई कानूनी सहायक। आज मैं आपकी क्या सहायता कर सकता हूँ?`
+      };
+      
+      return greetingsMap[activeLanguage] || greetingsMap.en;
+    }
+
+    function addChatBubble(text, sender, readAloud = false) {
+      const container = document.getElementById("chat-history-container");
+      const bubble = document.createElement("div");
+      bubble.className = `chat-bubble ${sender}`;
+      
+      const formattedText = text
+        .replace(/\n/g, "<br>")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+      bubble.innerHTML = `<p>${formattedText}</p>`;
+
+      if (sender === "bot") {
+        const speechBtn = document.createElement("button");
+        speechBtn.className = "chat-bubble-speaker";
+        speechBtn.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
+        speechBtn.onclick = () => speakBotResponse(text);
+        bubble.appendChild(speechBtn);
+      }
+
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+
+      if (sender === "bot" && (isElderMode || readAloud)) {
+        speakBotResponse(text);
+      }
+    }
+
+    function sendChatMessage() {
+      const inputEl = document.getElementById("chat-user-input");
+      const userText = inputEl.value.trim();
+      if (!userText) return;
+
+      addChatBubble(userText, "user");
+      inputEl.value = "";
+      chatbotConversationsCount++;
+
+      simulateBotReply(userText);
+    }
+
+    function handleSuggestionClick(text) {
+      addChatBubble(text, "user");
+      chatbotConversationsCount++;
+      simulateBotReply(text);
+    }
+
+    function renderSuggestionChips() {
+      const container = document.getElementById("suggestion-chips-container");
+      container.innerHTML = "";
+
+      const suggestionMap = {
+        en: ["My landlord is harassing me", "I need a divorce", "Consumer complaint registration", "Police FIR help"],
+        hi: ["मकान मालिक परेशान कर रहा है", "मुझे तलाक चाहिए", "उपभोक्ता शिकायत दर्ज करना", "पुलिस FIR की जानकारी"]
+      };
+
+      const items = suggestionMap[activeLanguage] || suggestionMap.en;
+      items.forEach(text => {
+        const chip = document.createElement("div");
+        chip.className = "suggestion-chip";
+        chip.innerText = text;
+        chip.onclick = () => handleSuggestionClick(text);
+        container.appendChild(chip);
+      });
+    }
+
+    function simulateBotReply(userText) {
+      const loader = document.getElementById("chat-typing-indicator");
+      loader.style.display = "flex";
+      
+      const container = document.getElementById("chat-history-container");
+      container.scrollTop = container.scrollHeight;
+
+      setTimeout(() => {
+        loader.style.display = "none";
+        
+        let response = matchLegalQuery(userText);
+        addChatBubble(response, "bot", true);
+
+        if (chatbotConversationsCount >= 3) {
+          setTimeout(() => {
+            const inviteText = activeLanguage === 'hi' 
+              ? `क्या आप गहन परामर्श के लिए सत्यापित मानव वकील से जुड़ना चाहेंगे?`
+              : `Would you like to connect with a verified human lawyer for deeper consultation?`;
+            
+            const inviteBubble = document.createElement("div");
+            inviteBubble.className = "chat-bubble bot";
+            inviteBubble.innerHTML = `
+              <p>${inviteText}</p>
+              <div style="margin-top:12px; display:flex; gap:10px;">
+                <button class="btn-gold" onclick="openLawyerDirectory()"><i class="fa-solid fa-user-tie"></i> Connect Now</button>
+                <button class="btn-silver" onclick="dismissLawyerInvitation(this)">Continue Free Chat</button>
+              </div>
+            `;
+            container.appendChild(inviteBubble);
+            container.scrollTop = container.scrollHeight;
+            chatbotConversationsCount = 0; // reset
+          }, 1000);
+        }
+      }, 1500);
+    }
+
+    function dismissLawyerInvitation(btn) {
+      btn.parentElement.innerHTML = `<span style="font-size:0.85rem; color:var(--text-muted);">Continuing free chat session...</span>`;
+    }
+
+    function matchLegalQuery(query) {
+      const cleanQuery = query.toLowerCase();
+      
+      for (const topic of legalTopicsDatabase) {
+        const match = topic.keywords.some(kw => cleanQuery.includes(kw.toLowerCase()));
+        if (match) {
+          return topic.response[activeLanguage] || topic.response.en;
+        }
+      }
+
+      const fallbackMap = {
+        en: "I understand you have a legal question. I can assist you with:\n• Tenant rights & eviction notices\n• Filing police FIRs and criminal custody terms\n• Consumer complaints and refund disputes\n• Alimony, child custody, and family agreements\n• Labor POSH issues and contract rules\n\nPlease refine your search words, or connect directly with a qualified lawyer using the options below.",
+        hi: "मैं समझता हूँ कि आपका कोई कानूनी प्रश्न है। मैं निम्नलिखित विषयों में सहायता कर सकता हूँ:\n• किरायेदार के अधिकार और बेदखली नोटिस\n• पुलिस एफआईआर और गिरफ्तारी नियम\n• उपभोक्ता शिकायतें और रिफंड विवाद\n• गुजारा भत्ता, बाल कस्टडी और पारिवारिक मामले\n• श्रम अधिकार और अनुबंध नियम\n\nकृपया अपने शब्दों को बदलें, या नीचे दिए गए विकल्पों का उपयोग कर वकील से बात करें।"
+      };
+
+      return fallbackMap[activeLanguage] || fallbackMap.en;
+    }
+
+    /* ==========================================
+       LAWYER DIRECTORY MODAL LIST
+       ========================================== */
+    const simulatedLawyers = [
+      { name: "Adv. Priya Sharma", spec: "Family & Divorce Law", rate: "4.9", fee: "₹1,500/call" },
+      { name: "Adv. Rajesh Iyer", spec: "Property & Rental Disputes", rate: "4.8", fee: "₹2,000/call" },
+      { name: "Adv. Vikramjit Singh", spec: "Criminal Trials & FIR bail", rate: "4.7", fee: "₹2,500/call" },
+      { name: "Adv. Ananya Roy", spec: "Consumer Court filings & IT Act", rate: "4.9", fee: "₹1,200/call" }
+    ];
+
+    function openLawyerDirectory() {
+      const container = document.getElementById("lawyers-list-container");
+      container.innerHTML = "";
+
+      simulatedLawyers.forEach(lawyer => {
+        const item = document.createElement("div");
+        item.className = "lawyer-listItem";
+        item.innerHTML = `
+          <div class="lawyer-info-box">
+            <div class="lawyer-name">${lawyer.name}</div>
+            <div class="lawyer-spec">${lawyer.spec}</div>
+            <div class="lawyer-rating"><i class="fa-solid fa-star"></i> ${lawyer.rate} Rating</div>
+          </div>
+          <div style="text-align: right; display:flex; flex-direction:column; gap:6px;">
+            <div class="lawyer-fee">${lawyer.fee}</div>
+            <button class="btn-gold" style="padding:6px 12px; font-size:0.85rem;" onclick="bookSimulatedAppointment('${lawyer.name}')">Book Now</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+
+      document.getElementById("lawyer-directory-modal").classList.add("active");
+    }
+
+    function bookSimulatedAppointment(lawyerName) {
+      closeModal("lawyer-directory-modal");
+      document.getElementById("booking-summary-text").innerText = `Your tele-consultation appointment with ${lawyerName} is registered. A verification link has been sent to your dashboard.`;
+      
+      const mockCase = {
+        title: `Consultation with ${lawyerName}`,
+        category: "Other",
+        desc: `Verified specialist booking for custom advice. Fee pending status check.`,
+        date: new Date(Date.now() + 86400000).toISOString().split('T')[0], // tomorrow
+        status: "Pending"
+      };
+      currentCasesList.push(mockCase);
+      localStorage.setItem("zynlaw_cases", JSON.stringify(currentCasesList));
+      
+      document.getElementById("booking-confirm-modal").classList.add("active");
+    }
+
+    /* ==========================================
+       SIMULATED AI DOCUMENT SCANNER ENGINE
+       ========================================== */
+    function triggerFileInput() {
+      document.getElementById("file-uploader").click();
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      currentSelectedFile = file;
+      document.getElementById("preview-filename").innerText = file.name;
+      document.getElementById("preview-filesize").innerText = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+      
+      document.getElementById("scanner-preview-box").style.display = "flex";
+      document.getElementById("start-scan-btn").disabled = false;
+    }
+
+    function clearFileSelection() {
+      currentSelectedFile = null;
+      document.getElementById("file-uploader").value = "";
+      document.getElementById("scanner-preview-box").style.display = "none";
+      document.getElementById("start-scan-btn").disabled = true;
+      
+      document.getElementById("analysis-results-view").style.display = "none";
+      document.getElementById("analysis-placeholder-view").style.display = "flex";
+    }
+
+    function simulateCameraCapture() {
+      showToast("Accessing Device Camera...");
+      setTimeout(() => {
+        const mockFile = {
+          name: "camera_capture_evidence.png",
+          size: 1800000
+        };
+        currentSelectedFile = mockFile;
+        document.getElementById("preview-filename").innerText = mockFile.name;
+        document.getElementById("preview-filesize").innerText = "1.80 MB";
+        document.getElementById("scanner-preview-box").style.display = "flex";
+        document.getElementById("start-scan-btn").disabled = false;
+        showToast("Image captured successfully!");
+      }, 1000);
+    }
+
+    const documentAnalysisMockData = {
+      rental: {
+        docType: "Residential Lease & Rental Agreement",
+        details: [
+          ["Lessor / Tenant", "Rahul Verma (Tenant) & Santosh Hegde (Landlord)"],
+          ["Premises Location", "Flat 402, Signature Residency, Bengaluru"],
+          ["Term Period", "11 Months starting June 1, 2026"],
+          ["Rental Value", "₹22,000 / month"],
+          ["Security Deposit", "₹1,50,000"]
+        ],
+        rights: [
+          "Right to live in habitable premises with operational utility lines.",
+          "Right to receive deposit refund within 7 working days of lease expiration.",
+          "Right to privacy: Landlord must serve 24h prior entry notice."
+        ],
+        actions: [
+          "Ensure stamp papers are valued at least ₹100 for valid court standing.",
+          "Document structural damage checks with photographs before moving in.",
+          "Ensure rent receipts are cataloged every month."
+        ],
+        warnings: [
+          { severity: "amber", text: "Clause 12 states Tenant must pay for entire plumbing repairs, contradicting typical wear-and-tear standards." },
+          { severity: "red", text: "Clause 17 allows landlord eviction with only 7 days notice. Standard Rent Control requires minimum 30 days notice." }
+        ]
+      },
+      summons: {
+        docType: "Court Summons / Legal Notice",
+        details: [
+          ["Issuing Authority", "District Consumer Disputes Redressal Commission, Pune"],
+          ["Case Ref No.", "CC/2026/184A"],
+          ["Petitioner / Plaintiff", "Deepak Kulkarni"],
+          ["Hearing Date", "July 12, 2026"],
+          ["Claim Matter", "Deficient Electronic Appliance services"]
+        ],
+        rights: [
+          "Right to present reply arguments before the commission.",
+          "Right to appear in person or represent through an advocate."
+        ],
+        actions: [
+          "File written statement reply within 30 days of receiving this summons notice.",
+          "Compile purchase receipts, warranty cards, and repair log entries.",
+          "Register on e-Daakhil for tracking updates."
+        ],
+        warnings: [
+          { severity: "red", text: "Failure to appear on July 12, 2026 will result in Ex-Parte order execution in favor of plaintiff." }
+        ]
+      },
+      will: {
+        docType: "Last Will and Testament",
+        details: [
+          ["Testator", "Devendra Nath Sen"],
+          ["Attesting Witnesses", "Dr. A.K. Roy & Advocate S. Bannerjee"],
+          ["Executors", "Amit Sen (Son)"],
+          ["Date Executed", "April 15, 2024"]
+        ],
+        rights: [
+          "Testator has absolute right to bequeath self-acquired properties.",
+          "Ancestral property bequeathments are subject to ancestral legal succession limits."
+        ],
+        actions: [
+          "Ensure two attesting witnesses have signed in the presence of Testator.",
+          "Registering Will at Sub-Registrar office is highly recommended to prevent forgery challenges."
+        ],
+        warnings: [
+          { severity: "amber", text: "Signature on Page 3 appears faded. Ensure stamp signature is notarized properly." }
+        ]
+      },
+      contract: {
+        docType: "Employment Agreement",
+        details: [
+          ["Employer", "Vistara Tech Solutions Pvt Ltd"],
+          ["Employee", "Meera Krishnan"],
+          ["Designation", "Senior Associate Engineer"],
+          ["Remuneration Package", "₹8,50,000 / annum"],
+          ["Notice Period", "90 Days"]
+        ],
+        rights: [
+          "Right to maternity benefit leaves as per Maternity Act, 1961.",
+          "Right to formal exit evaluation and experience letters."
+        ],
+        actions: [
+          "Review Non-Compete restrictions (Clause 14) which forbids working with competitors for 1 year.",
+          "Compare notice period terms with other industry firms."
+        ],
+        warnings: [
+          { severity: "amber", text: "Non-compete covenants are usually unenforceable under Section 27 of Indian Contract Act, but can trigger litigation harassment." }
+        ]
+      },
+      fir: {
+        docType: "Police FIR (First Information Report)",
+        details: [
+          ["Police Station", "Cyber Crime Cell, Indiranagar PS, Bengaluru"],
+          ["FIR Number", "0142/2026"],
+          ["Date Registered", "May 29, 2026"],
+          ["Sections Charged", "Sec 66C & 66D of IT Act (Identity Theft & Fraud)"],
+          ["Complainant", "You"]
+        ],
+        rights: [
+          "Right to receive a free, signed copy of the FIR copy immediately.",
+          "Right to track investigation progress updates from Investigating Officer."
+        ],
+        actions: [
+          "Submit copy of bank statements and card logs to the Investigating Officer.",
+          "Ensure written acknowledgement contains signature of PS Inspector."
+        ],
+        warnings: [
+          { severity: "amber", text: "Ensure accurate financial transactions figures are matching the police document body." }
+        ]
+      }
+    };
+
+    function runDocumentAnalysis() {
+      if (!currentSelectedFile) return;
+
+      const placeholder = document.getElementById("analysis-placeholder-view");
+      const loader = document.getElementById("scanning-progress-loader");
+      const resultsView = document.getElementById("analysis-results-view");
+
+      placeholder.style.display = "none";
+      resultsView.style.display = "none";
+      loader.style.display = "flex";
+
+      setTimeout(() => {
+        loader.style.display = "none";
+        
+        const override = document.getElementById("scan-override-type").value;
+        let selectedData = documentAnalysisMockData.rental; 
+
+        if (override !== "auto") {
+          selectedData = documentAnalysisMockData[override];
+        } else {
+          const fname = currentSelectedFile.name.toLowerCase();
+          if (fname.includes("rent") || fname.includes("lease") || fname.includes("agree")) {
+            selectedData = documentAnalysisMockData.rental;
+          } else if (fname.includes("summon") || fname.includes("notice") || fname.includes("court")) {
+            selectedData = documentAnalysisMockData.summons;
+          } else if (fname.includes("will") || fname.includes("testa")) {
+            selectedData = documentAnalysisMockData.will;
+          } else if (fname.includes("contract") || fname.includes("employ")) {
+            selectedData = documentAnalysisMockData.contract;
+          } else if (fname.includes("fir") || fname.includes("police")) {
+            selectedData = documentAnalysisMockData.fir;
+          }
+        }
+
+        document.getElementById("res-doc-type").innerText = selectedData.docType;
+        
+        const table = document.getElementById("res-details-table");
+        table.innerHTML = `<tr><th>Detail Fields</th><th>Extracted Values</th></tr>`;
+        selectedData.details.forEach(row => {
+          table.innerHTML += `<tr><td><strong>${row[0]}</strong></td><td>${row[1]}</td></tr>`;
+        });
+
+        const rightsList = document.getElementById("res-rights-list");
+        rightsList.innerHTML = "";
+        selectedData.rights.forEach(right => {
+          rightsList.innerHTML += `<li>${right}</li>`;
+        });
+
+        const actionsList = document.getElementById("res-actions-list");
+        actionsList.innerHTML = "";
+        selectedData.actions.forEach(action => {
+          actionsList.innerHTML += `<li>${action}</li>`;
+        });
+
+        const riskBox = document.getElementById("res-risk-flags");
+        riskBox.innerHTML = "";
+        selectedData.warnings.forEach(warn => {
+          const severityClass = warn.severity; 
+          const icon = severityClass === 'red' ? 'fa-circle-radiation' : 'fa-triangle-exclamation';
+          riskBox.innerHTML += `
+            <div class="risk-flag-item ${severityClass}">
+              <i class="fa-solid ${icon}"></i>
+              <span>${warn.text}</span>
+            </div>
+          `;
+        });
+
+        resultsView.style.display = "block";
+        showToast("Analysis Completed!");
+      }, 2500);
+    }
+
+    function downloadAnalysisReport() {
+      const docType = document.getElementById("res-doc-type").innerText;
+      let textContent = `==================================================\n`;
+      textContent += `ZYNLAW AI COMPLIANCE ANALYSIS REPORT\n`;
+      textContent += `Document Type: ${docType}\n`;
+      textContent += `Analysis Date: ${new Date().toLocaleDateString()}\n`;
+      textContent += `==================================================\n\n`;
+
+      textContent += `1. KEY DETAILS EXTRACTED:\n`;
+      const rows = document.querySelectorAll("#res-details-table tr");
+      rows.forEach((row, idx) => {
+        if (idx === 0) return;
+        const tds = row.querySelectorAll("td");
+        if(tds.length === 2) {
+          textContent += `- ${tds[0].innerText}: ${tds[1].innerText}\n`;
+        }
+      });
+
+      textContent += `\n2. YOUR LEGAL RIGHTS:\n`;
+      document.querySelectorAll("#res-rights-list li").forEach(li => {
+        textContent += `- ${li.innerText}\n`;
+      });
+
+      textContent += `\n3. RECOMMENDED ACTIONS:\n`;
+      document.querySelectorAll("#res-actions-list li").forEach((li, index) => {
+        textContent += `${index + 1}. ${li.innerText}\n`;
+      });
+
+      textContent += `\n4. SECURITY RISK FLAGS IDENTIFIED:\n`;
+      document.querySelectorAll("#res-risk-flags .risk-flag-item").forEach(item => {
+        textContent += `[!WARNING] ${item.innerText}\n`;
+      });
+
+      const blob = new Blob([textContent], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `ZynLaw_Analysis_${docType.replace(/\s+/g, "_")}.txt`;
+      link.click();
+    }
+
+    /* ==========================================
+       TAB 3: LEGAL RIGHTS ACCORDION DIRECTORY
+       ========================================== */
+    const legalRightsDirectoryList = {
+      en: [
+        {
+          category: "Fundamental Rights",
+          icon: "fa-scale-balanced",
+          items: [
+            { title: "Article 14: Right to Equality", desc: "Guarantees that every citizen is equal before the law, prohibiting arbitrary discrimination by the State on grounds of religion, race, caste, sex, or place of birth." },
+            { title: "Article 19: Freedom of Speech", desc: "Provides six democratic freedoms including free speech and expression, peaceful assembly, association, movement, residence, and practicing any profession." },
+            { title: "Article 21: Right to Life & Liberty", desc: "An expansive right stating no person shall be deprived of life or personal liberty except according to procedure established by law. Includes right to privacy and education." }
+          ]
+        },
+        {
+          category: "Consumer Protections",
+          icon: "fa-basket-shopping",
+          items: [
+            { title: "Right to Safety & Information", desc: "Consumers have the right to be protected against marketing of goods hazardous to life, and be informed of quality, quantity, purity, standard, and price of goods." },
+            { title: "Right to Seek Redressal", desc: "Empowers consumers to file complaints against unfair trade practices or exploitation in District, State, or National Commissions." }
+          ]
+        },
+        {
+          category: "Women's Welfare Rights",
+          icon: "fa-venus",
+          items: [
+            { title: "Protection from Domestic Violence", desc: "The Protection of Women from Domestic Violence Act, 2005 provides civil protection orders, residence remedies, and monetary relief against abusive spouses/family." },
+            { title: "POSH Act Safeguards", desc: "Protects women against sexual harassment at all workplaces, mandating Internal Complaints Committees for any business employing over 10 people." }
+          ]
+        },
+        {
+          category: "Senior Citizen Rights",
+          icon: "fa-person-cane",
+          items: [
+            { title: "Maintenance & Welfare of Parents Act", desc: "Enables senior citizens and parents who are unable to maintain themselves to claim a monthly maintenance allowance from children or heirs through a simplified tribunal." },
+            { title: "Senior Concessions & Free Legal Aid", desc: "Includes tax exemptions, healthcare allowances, and guaranteed free legal representation in judicial hearings under Section 12 of Legal Services Authorities Act." }
+          ]
+        }
+      ],
+      hi: [
+        {
+          category: "मौलिक अधिकार",
+          icon: "fa-scale-balanced",
+          items: [
+            { title: "अनुच्छेद 14: समानता का अधिकार", desc: "गारंटी देता है कि प्रत्येक नागरिक कानून के समक्ष समान है, राज्य द्वारा किसी भी प्रकार के भेदभाव का निषेध है।" },
+            { title: "अनुच्छेद 19: अभिव्यक्ति की स्वतंत्रता", desc: "भाषण, शांतिपूर्ण सभा, संघ बनाने, और देश में कहीं भी स्वतंत्र रूप से घूमने की स्वतंत्रता।" },
+            { title: "अनुच्छेद 21: जीवन और स्वतंत्रता का अधिकार", desc: "जीवन और व्यक्तिगत स्वतंत्रता की सुरक्षा। इसमें गोपनीयता और शिक्षा का अधिकार शामिल है।" }
+          ]
+        },
+        {
+          category: "उपभोक्ता अधिकार",
+          icon: "fa-basket-shopping",
+          items: [
+            { title: "सुरक्षा और जानकारी का अधिकार", desc: "सामानों की गुणवत्ता, मात्रा और कीमत के बारे में सूचित होने का अधिकार।" },
+            { title: "निवारण पाने का अधिकार", desc: "अनुचित व्यापार प्रथाओं के खिलाफ उपभोक्ता आयोगों में दावा दर्ज करने का अधिकार।" }
+          ]
+        },
+        {
+          category: "महिला कल्याण अधिकार",
+          icon: "fa-venus",
+          items: [
+            { title: "घरेलू हिंसा से संरक्षण", desc: "घरेलू हिंसा से महिला संरक्षण अधिनियम, 2005 शारीरिक, मानसिक या आर्थिक शोषण के खिलाफ अधिकार देता है।" },
+            { title: "कार्यस्थल पर सुरक्षा (POSH)", desc: "कामकाजी महिलाओं को यौन उत्पीड़न से सुरक्षा और शिकायत दर्ज करने के लिए ICC समिति का अधिकार।" }
+          ]
+        },
+        {
+          category: "वरिष्ठ नागरिक अधिकार",
+          icon: "fa-person-cane",
+          items: [
+            { title: "माता-पिता एवं वरिष्ठ नागरिक भरण-पोषण अधिनियम", desc: "वरिष्ठ नागरिकों को अपने बच्चों या उत्तराधिकारियों से मासिक भरण-पोषण भत्ता प्राप्त करने का कानूनी अधिकार।" },
+            { title: "मुफ्त कानूनी सहायता", desc: "कानूनी सेवा प्राधिकरण अधिनियम की धारा 12 के तहत मुफ्त कानूनी वकील और सहायता का अधिकार।" }
+          ]
+        }
+      ]
+    };
+
+    // Fill rights lists for remaining languages
+    Object.keys(translations).forEach(lang => {
+      if (lang !== 'en' && lang !== 'hi') {
+        legalRightsDirectoryList[lang] = legalRightsDirectoryList.en.map(cat => ({
+          category: `[${lang.toUpperCase()}] ${cat.category}`,
+          icon: cat.icon,
+          items: cat.items.map(item => ({
+            title: `[${lang.toUpperCase()}] ${item.title}`,
+            desc: item.desc
+          }))
+        }));
+      }
+    });
+
+    function renderRightsDirectory() {
+      const container = document.getElementById("rights-categories-grid");
+      container.innerHTML = "";
+
+      const currentList = legalRightsDirectoryList[activeLanguage] || legalRightsDirectoryList.en;
+
+      currentList.forEach(cat => {
+        let cardHTML = `
+          <div class="metal-frame">
+            <div class="metal-card rights-category-card">
+              <h3><i class="fa-solid ${cat.icon}"></i> ${cat.category}</h3>
+        `;
+
+        cat.items.forEach(item => {
+          cardHTML += `
+            <div class="accordion-item">
+              <button class="accordion-header" onclick="toggleAccordion(this)">
+                <span>${item.title}</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="accordion-content">
+                <p>${item.desc}</p>
+              </div>
+            </div>
+          `;
+        });
+
+        cardHTML += `</div></div>`;
+        container.innerHTML += cardHTML;
+      });
+    }
+
+    function toggleAccordion(btn) {
+      const item = btn.parentElement;
+      const wasActive = item.classList.contains("active");
+      
+      item.parentElement.querySelectorAll(".accordion-item").forEach(el => {
+        el.classList.remove("active");
+      });
+
+      if (!wasActive) {
+        item.classList.add("active");
+      }
+    }
+
+    function filterRights() {
+      const searchVal = document.getElementById("rights-search-input").value.toLowerCase();
+      const accordionItems = document.querySelectorAll("#rights-categories-grid .accordion-item");
+      
+      accordionItems.forEach(item => {
+        const titleText = item.querySelector(".accordion-header span").innerText.toLowerCase();
+        const descText = item.querySelector(".accordion-content p").innerText.toLowerCase();
+        
+        if (titleText.includes(searchVal) || descText.includes(searchVal)) {
+          item.style.display = "block";
+        } else {
+          item.style.display = "none";
+        }
+      });
+    }
+
+    /* ==========================================
+       TAB 4: MY CASES (CASE TRACKER CRUD)
+       ========================================== */
+    function renderCasesList() {
+      const container = document.getElementById("cases-grid-container");
+      container.innerHTML = "";
+
+      const stored = localStorage.getItem("zynlaw_cases");
+      currentCasesList = stored ? JSON.parse(stored) : [];
+
+      let activeCount = 0;
+      let pendingCount = 0;
+      let closedCount = 0;
+
+      currentCasesList.forEach(c => {
+        if(c.status === "Active") activeCount++;
+        else if(c.status === "Pending") pendingCount++;
+        else if(c.status === "Closed") closedCount++;
+      });
+
+      document.getElementById("stat-total").innerText = currentCasesList.length;
+      document.getElementById("stat-active").innerText = activeCount;
+      document.getElementById("stat-pending").innerText = pendingCount;
+      document.getElementById("stat-closed").innerText = closedCount;
+
+      if (currentCasesList.length === 0) {
+        container.innerHTML = `
+          <div class="no-cases-placeholder">
+            <i class="fa-solid fa-briefcase" style="font-size: 3rem; margin-bottom:15px; color:rgba(255,255,255,0.05);"></i>
+            <h3 data-i18n="no_cases">No cases tracked yet.</h3>
+            <p style="color:var(--text-muted); margin-top:5px;">Click \"Add New Case\" above to start managing your legal issues.</p>
+          </div>
+        `;
+        return;
+      }
+
+      currentCasesList.forEach((c, index) => {
+        const cardFrame = document.createElement("div");
+        cardFrame.className = "metal-frame";
+        
+        let badgeClass = c.status.toLowerCase();
+        
+        cardFrame.innerHTML = `
+          <div class="metal-card case-card">
+            <div>
+              <div class="case-card-header">
+                <span class="case-card-category">${c.category}</span>
+                <span class="case-badge ${badgeClass}">${c.status}</span>
+              </div>
+              <h3 class="case-card-title">${c.title}</h3>
+              <p class="case-card-desc">${c.desc}</p>
+            </div>
+            
+            <div class="case-card-meta">
+              <div>
+                <span style="color:var(--text-muted);">Action Date:</span>
+                <strong style="color:var(--accent-gold);">${c.date}</strong>
+              </div>
+            </div>
+
+            <div class="case-card-actions">
+              <button class="btn-silver" style="flex:1; padding:8px;" onclick="editCaseRecord(${index})">
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </button>
+              <button class="btn-silver" style="flex:1; padding:8px; border-color:rgba(255,23,68,0.3); color:#ff8a80;" onclick="deleteCaseRecord(${index})">
+                <i class="fa-solid fa-trash-can"></i> Delete
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(cardFrame);
+      });
+    }
+
+    function openAddCaseModal() {
+      document.getElementById("case-form").reset();
+      document.getElementById("case-edit-index").value = "-1";
+      document.getElementById("case-modal-title-text").innerText = "Add New Case";
+      document.getElementById("case-creator-modal").classList.add("active");
+    }
+
+    function editCaseRecord(index) {
+      const c = currentCasesList[index];
+      document.getElementById("case-edit-index").value = index;
+      document.getElementById("case-form-title").value = c.title;
+      document.getElementById("case-form-category").value = c.category;
+      document.getElementById("case-form-desc").value = c.desc;
+      document.getElementById("case-form-date").value = c.date;
+      document.getElementById("case-form-status").value = c.status;
+      
+      document.getElementById("case-modal-title-text").innerText = "Edit Case Details";
+      document.getElementById("case-creator-modal").classList.add("active");
+    }
+
+    function deleteCaseRecord(index) {
+      if (confirm("Are you sure you want to delete this case?")) {
+        currentCasesList.splice(index, 1);
+        localStorage.setItem("zynlaw_cases", JSON.stringify(currentCasesList));
+        renderCasesList();
+        showToast("Case removed successfully!");
+      }
+    }
+
+    function saveCaseRecord(e) {
+      e.preventDefault();
+      
+      const index = parseInt(document.getElementById("case-edit-index").value);
+      const title = document.getElementById("case-form-title").value;
+      const category = document.getElementById("case-form-category").value;
+      const desc = document.getElementById("case-form-desc").value;
+      const date = document.getElementById("case-form-date").value;
+      const status = document.getElementById("case-form-status").value;
+
+      const record = { title, category, desc, date, status };
+
+      if (index === -1) {
+        currentCasesList.push(record);
+        showToast("New case created!");
+      } else {
+        currentCasesList[index] = record;
+        showToast("Case details updated!");
+      }
+
+      localStorage.setItem("zynlaw_cases", JSON.stringify(currentCasesList));
+      closeModal("case-creator-modal");
+      renderCasesList();
+    }
+
+    /* ==========================================
+       UTILITIES & SYSTEM SETTINGS MANAGERS
+       ========================================== */
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("active");
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add("active");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("app-toast-alert");
+      document.getElementById("toast-alert-text").innerText = message;
+      toast.style.display = "flex";
+
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 3500);
+    }
+
+    function rotateDailyTip() {
+      const tips = dailyTipsList[activeLanguage] || dailyTipsList.en;
+      const tipIndex = new Date().getDate() % tips.length;
+      document.getElementById("daily-tip-content").innerText = tips[tipIndex];
+    }
+
+    function updateProfileBadge() {
+      if(!currentUserProfile) return;
+      
+      document.getElementById("user-welcome-name").innerText = `Hello, ${currentUserProfile.name}!`;
+      
+      const parts = currentUserProfile.name.split(" ");
+      let initials = parts[0].substring(0, 1).toUpperCase();
+      if(parts.length > 1) {
+        initials += parts[parts.length - 1].substring(0, 1).toUpperCase();
+      }
+      document.getElementById("user-avatar-initials").innerText = initials;
+      document.getElementById("user-welcome-details").innerText = `Language: ${currentUserProfile.language.toUpperCase()} • Age: ${currentUserProfile.age}`;
+    }
+
+    function clearAllUserData() {
+      if (confirm("This will delete all case history, onboarding profile data, and settings preferences. Are you sure you want to continue?")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    /* ==========================================
+       STARTUP AND RUNTIME ENGINE
+       ========================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        const splash = document.getElementById("splash-screen");
+        splash.classList.add("fade-out");
+        
+        const storedUser = localStorage.getItem("zynlaw_user");
+        if (storedUser) {
+          currentUserProfile = JSON.parse(storedUser);
+          
+          activeLanguage = localStorage.getItem("zynlaw_lang") || "en";
+          isElderMode = localStorage.getItem("zynlaw_elder_mode") === "true";
+          
+          document.getElementById("elder-mode-toggle").checked = isElderMode;
+          toggleElderMode(isElderMode);
+          changeLanguage(activeLanguage);
+          
+          document.getElementById("app-container").style.display = "flex";
+          initializeDashboard();
+        } else {
+          document.getElementById("onboarding-container").style.display = "flex";
+        }
+      }, 2500);
+    });
+
+    function initializeDashboard() {
+      updateProfileBadge();
+      initializeChatbot();
+      rotateDailyTip();
+      renderRightsDirectory();
+      renderCasesList();
+    }
+  </script>
+</body>
+</html>
