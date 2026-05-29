@@ -170,6 +170,29 @@
       mix-blend-mode: screen;
     }
 
+    .cursor-target-ring {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(125, 211, 252, 0.85);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0.85);
+      opacity: 0.8;
+      transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.18s ease;
+      z-index: 9999;
+      mix-blend-mode: screen;
+      box-shadow: 0 0 12px rgba(125, 211, 252, 0.25);
+    }
+
+    .cursor-target-ring.active {
+      transform: translate(-50%, -50%) scale(1.15);
+      opacity: 1;
+      box-shadow: 0 0 24px rgba(125, 211, 252, 0.55), 0 0 40px rgba(186, 68, 255, 0.18);
+    }
+
     /* ==========================================
        SPLASH SCREEN
        ========================================== */
@@ -283,6 +306,7 @@
       -webkit-backdrop-filter: blur(16px);
       transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, border var(--transition-speed);
       z-index: 1;
+      will-change: transform, box-shadow;
     }
 
     .metal-card::before {
@@ -307,8 +331,12 @@
       opacity: 1;
     }
 
-    .metal-card:hover {
-      box-shadow: var(--glow-shadow);
+    .metal-card.attracting {
+      box-shadow: 0 28px 72px rgba(125, 211, 252, 0.28), 0 0 40px rgba(186, 68, 255, 0.16);
+    }
+
+    .metal-card.attracting::before {
+      opacity: 1;
     }
 
     /* Decorative metal frame */
@@ -3992,16 +4020,64 @@
 
     function initGalaxyCursorGlow() {
       const root = document.documentElement;
+      const cursorRing = document.createElement("div");
+      cursorRing.id = "cursor-target-ring";
+      document.body.appendChild(cursorRing);
+      cursorRing.style.left = "50%";
+      cursorRing.style.top = "50%";
+
+      const magneticCards = Array.from(document.querySelectorAll('.metal-card'));
+      const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      let rafId = null;
+
+      function updateCards() {
+        let nearAny = false;
+
+        magneticCards.forEach((card) => {
+          const rect = card.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          const dx = pointer.x - centerX;
+          const dy = pointer.y - centerY;
+          const distance = Math.hypot(dx, dy);
+          const attractionRadius = Math.max(190, Math.min(320, rect.width * 1.1));
+
+          if (distance < attractionRadius) {
+            nearAny = true;
+            const strength = 1 - distance / attractionRadius;
+            const moveX = dx * 0.14 * strength;
+            const moveY = dy * 0.11 * strength;
+            const scale = 1 + 0.014 * strength;
+
+            card.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
+            card.classList.add('attracting');
+          } else {
+            card.style.transform = '';
+            card.classList.remove('attracting');
+          }
+        });
+
+        cursorRing.classList.toggle('active', nearAny);
+        rafId = requestAnimationFrame(updateCards);
+      }
 
       window.addEventListener("mousemove", (event) => {
+        pointer.x = event.clientX;
+        pointer.y = event.clientY;
+        cursorRing.style.left = `${pointer.x}px`;
+        cursorRing.style.top = `${pointer.y}px`;
         root.style.setProperty("--mouse-x", `${event.clientX}px`);
         root.style.setProperty("--mouse-y", `${event.clientY}px`);
       });
 
       window.addEventListener("mouseout", () => {
+        cursorRing.style.left = "50%";
+        cursorRing.style.top = "50%";
         root.style.setProperty("--mouse-x", "50%");
         root.style.setProperty("--mouse-y", "50%");
       });
+
+      updateCards();
     }
 
     /* ==========================================
