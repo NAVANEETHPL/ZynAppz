@@ -1,0 +1,17 @@
+{
+  "name": "zynappz",
+  "version": "1.0.0",
+  "description": "Zynappz AI Suite Web App",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "Team Zynappz",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}

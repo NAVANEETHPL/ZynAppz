@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zynappz — The Ultimate AI Hub</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <!-- PDF.js library for client-side PDF extraction -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <script type="module" crossorigin src="/assets/index-D5Pv6Jt-.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DvKlUbnX.css">
+</head>
+<body>
+
+  <!-- Particle Background Canvas -->
+  <canvas id="bg-particles"></canvas>
+
+  <!-- Glowing Custom Cursor -->
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-outline" id="cursor-outline"></div>
+
+  <!-- Main Layout -->
+  <div class="app-layout">
+    
+    <!-- Sidebar Navbar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-z">Z</div>
+          <span>Zynappz</span>
+        </div>
+      </div>
+      
+      <nav class="nav-links">
+        <button class="nav-btn active" data-page="zy" id="nav-zy">
+          <i data-lucide="message-square-code"></i>
+          <span>Zy Assistant</span>
+        </button>
+        <button class="nav-btn" data-page="image-tools" id="nav-image-tools">
+          <i data-lucide="image"></i>
+          <span>Image Tools</span>
+        </button>
+        <button class="nav-btn" data-page="detector" id="nav-detector">
+          <i data-lucide="shield-alert"></i>
+          <span>AI Detector</span>
+        </button>
+        <button class="nav-btn" data-page="news" id="nav-news">
+          <i data-lucide="newspaper"></i>
+          <span>AI News</span>
+        </button>
+        <button class="nav-btn" data-page="lawyer" id="nav-lawyer">
+          <i data-lucide="scale"></i>
+          <span>AI Lawyer</span>
+        </button>
+        <button class="nav-btn" data-page="gallery" id="nav-gallery">
+          <i data-lucide="images"></i>
+          <span>Gallery</span>
+        </button>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <button class="settings-btn" id="btn-open-settings">
+          <i data-lucide="settings"></i>
+          <span>API Settings</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Top Navbar for Mobile -->
+    <header class="mobile-header">
+      <div class="logo">
+        <div class="logo-z">Z</div>
+        <span>Zynappz</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="btn-mobile-settings">
+          <i data-lucide="settings"></i>
+        </button>
+        <button class="icon-btn" id="btn-toggle-menu">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </header>
+    
+    <!-- Mobile Drawer Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobile-menu">
+      <div class="mobile-menu-container glass-card">
+        <div class="mobile-menu-header">
+          <div class="logo">
+            <div class="logo-z">Z</div>
+            <span>Zynappz</span>
+          </div>
+          <button class="icon-btn" id="btn-close-menu">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <nav class="mobile-nav-links">
+          <button class="mobile-nav-btn active" data-page="zy">
+            <i data-lucide="message-square-code"></i>
+            <span>Zy Assistant</span>
+          </button>
+          <button class="mobile-nav-btn" data-page="image-tools">
+            <i data-lucide="image"></i>
+            <span>Image Tools</span>
+          </button>
+          <button class="mobile-nav-btn" data-page="detector">
+            <i data-lucide="shield-alert"></i>
+            <span>AI Detector</span>
+          </button>
+          <button class="mobile-nav-btn" data-page="news">
+            <i data-lucide="newspaper"></i>
+            <span>AI News</span>
+          </button>
+          <button class="mobile-nav-btn" data-page="lawyer">
+            <i data-lucide="scale"></i>
+            <span>AI Lawyer</span>
+          </button>
+          <button class="mobile-nav-btn" data-page="gallery">
+            <i data-lucide="images"></i>
+            <span>Gallery</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- PAGE 1: ZY ASSISTANT -->
+      <section class="page active" id="page-zy">
+        <div class="page-header">
+          <h1>Zy <span class="badge">Chatbot</span></h1>
+          <p class="subtitle">Friendly, smart AI assistant built by Team Zynappz</p>
+        </div>
+        
+        <div class="chat-container glass-card">
+          <div class="chat-messages" id="zy-chat-messages">
+            <!-- Messages populated via JS -->
+            <div class="chat-bubble left system">
+              <div class="bubble-avatar"><i data-lucide="sparkles"></i></div>
+              <div class="bubble-content">
+                Hello! I am <strong>Zy</strong>, the official friendly chatbot for Zynappz! 🚀<br><br>
+                I can help you navigate the app, explain features, and even <strong>generate stunning AI images</strong> inline! Simply ask me to <em>"generate an image of..."</em> or <em>"draw a..."</em> and witness the magic.
+              </div>
+            </div>
+          </div>
+          
+          <!-- Typing Indicator -->
+          <div class="typing-indicator" id="zy-typing-indicator" style="display: none;">
+            <span></span><span></span><span></span>
+          </div>
+
+          <div class="chat-input-area">
+            <input type="text" id="zy-chat-input" placeholder="Type a message or ask me to 'generate an image of...'..." autocomplete="off">
+            <button class="btn btn-accent" id="btn-zy-send">
+              <i data-lucide="send"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 2: AI IMAGE TOOLS -->
+      <section class="page" id="page-image-tools">
+        <div class="page-header">
+          <h1>AI Image <span class="badge">Tools</span></h1>
+          <p class="subtitle">Four state-of-the-art client-side image modification engines</p>
+        </div>
+        
+        <!-- Image Tools Sub Tabs -->
+        <div class="tabs-navigation glass-card">
+          <button class="tab-btn active" data-tab="enhance">AI Enhance</button>
+          <button class="tab-btn" data-tab="bg-remover">BG Remover</button>
+          <button class="tab-btn" data-tab="upscaler">AI Upscaler</button>
+          <button class="tab-btn" data-tab="light-corrector">Light Corrector</button>
+        </div>
+
+        <!-- Tab 1: AI ENHANCE -->
+        <div class="tab-content active" id="tab-enhance">
+          <div class="grid-2col">
+            <div class="glass-card upload-section">
+              <h3>Upload Image</h3>
+              <p class="text-muted">Sends your image to OpenAI's GPT-4o Vision API to analyze and enhance quality, sharpness, and lighting.</p>
+              
+              <div class="drop-zone" id="enhance-drop-zone">
+                <i data-lucide="cloud-upload" class="upload-icon"></i>
+                <p>Drag & drop or <span class="highlight">browse</span></p>
+                <input type="file" id="enhance-file-input" accept="image/*" class="file-input">
+              </div>
+              
+              <div class="preview-box" id="enhance-preview-box" style="display: none;">
+                <img id="enhance-img-preview" src="#" alt="Preview">
+                <button class="btn btn-danger btn-sm" id="btn-enhance-clear">Remove</button>
+              </div>
+
+              <button class="btn btn-accent w-100 mt-4" id="btn-enhance-process" disabled>
+                <i data-lucide="sparkles"></i> Process with GPT-4o Vision
+              </button>
+            </div>
+
+            <div class="glass-card result-section flex-col">
+              <h3>Enhancement Breakdown</h3>
+              <div class="result-placeholder" id="enhance-placeholder">
+                <i data-lucide="sparkles" class="icon-lg"></i>
+                <p>Upload and process an image to see the high-quality OpenAI vision enhancements details.</p>
+              </div>
+              <div class="result-view" id="enhance-result" style="display: none;">
+                <div class="enhance-description" id="enhance-description-text"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: BG REMOVER -->
+        <div class="tab-content" id="tab-bg-remover">
+          <div class="grid-2col">
+            <div class="glass-card upload-section">
+              <h3>Remove Background</h3>
+              <p class="text-muted">Direct high-performance background removal powered by the remove.bg API.</p>
+              
+              <div class="drop-zone" id="bg-drop-zone">
+                <i data-lucide="image-minus" class="upload-icon"></i>
+                <p>Drag & drop or <span class="highlight">browse</span></p>
+                <input type="file" id="bg-file-input" accept="image/*" class="file-input">
+              </div>
+              
+              <div class="preview-box" id="bg-preview-box" style="display: none;">
+                <img id="bg-img-preview" src="#" alt="Preview">
+                <button class="btn btn-danger btn-sm" id="btn-bg-clear">Remove</button>
+              </div>
+
+              <button class="btn btn-accent w-100 mt-4" id="btn-bg-process" disabled>
+                <i data-lucide="scissors"></i> Extract Foreground
+              </button>
+            </div>
+
+            <div class="glass-card result-section flex-col">
+              <h3>Extracted Image</h3>
+              <div class="result-placeholder" id="bg-placeholder">
+                <i data-lucide="blend" class="icon-lg"></i>
+                <p>Run the background remover to isolate the subject with transparency.</p>
+              </div>
+              <div class="result-view" id="bg-result" style="display: none;">
+                <div class="transparent-checkerboard">
+                  <img id="bg-img-result" src="#" alt="Transparent Output">
+                </div>
+                <a id="btn-bg-download" class="btn btn-accent w-100 mt-4" download="zynappz_no_bg.png" href="#">
+                  <i data-lucide="download"></i> Download PNG
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: AI UPSCALER -->
+        <div class="tab-content" id="tab-upscaler">
+          <div class="grid-2col">
+            <div class="glass-card upload-section">
+              <h3>Simulated 2x Bicubic Upscaler</h3>
+              <p class="text-muted">Doubles the image canvas grid with advanced HTML5 bicubic filtering algorithms and high-contrast sharpness restoration.</p>
+              
+              <div class="drop-zone" id="upscale-drop-zone">
+                <i data-lucide="maximize" class="upload-icon"></i>
+                <p>Drag & drop or <span class="highlight">browse</span></p>
+                <input type="file" id="upscale-file-input" accept="image/*" class="file-input">
+              </div>
+              
+              <div class="preview-box" id="upscale-preview-box" style="display: none;">
+                <button class="btn btn-danger btn-sm" id="btn-upscale-clear">Remove</button>
+              </div>
+
+              <button class="btn btn-accent w-100 mt-4" id="btn-upscale-process" disabled>
+                <i data-lucide="sparkles"></i> Upscale Image (2x)
+              </button>
+            </div>
+
+            <div class="glass-card result-section flex-col">
+              <h3>Upscale Slider Comparison</h3>
+              <div class="result-placeholder" id="upscale-placeholder">
+                <i data-lucide="expand" class="icon-lg"></i>
+                <p>Simulate bicubic resolution rendering with a split-screen slider.</p>
+              </div>
+              
+              <div class="result-view" id="upscale-result" style="display: none;">
+                <div class="slider-wrapper" id="upscale-slider-wrapper">
+                  <!-- Original Image -->
+                  <div class="slider-image original">
+                    <img id="upscale-img-original" src="#" alt="Original">
+                  </div>
+                  <!-- Enhanced Image -->
+                  <div class="slider-image modified" id="upscale-slider-modified">
+                    <canvas id="upscale-canvas-enhanced"></canvas>
+                  </div>
+                  <!-- Slider Controller -->
+                  <div class="slider-handle" id="upscale-slider-handle">
+                    <div class="slider-handle-line"></div>
+                    <div class="slider-handle-button"><i data-lucide="arrow-left-right"></i></div>
+                  </div>
+                </div>
+                <div class="flex-row mt-4">
+                  <a id="btn-upscale-download" class="btn btn-accent flex-1" download="zynappz_upscaled.png" href="#">
+                    <i data-lucide="download"></i> Download Upscaled Image
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: LIGHT CORRECTOR -->
+        <div class="tab-content" id="tab-light-corrector">
+          <div class="grid-2col">
+            <div class="glass-card upload-section">
+              <h3>Light & Contrast Corrector</h3>
+              <p class="text-muted">Analyzes the pixel luminosity histogram to automatically balance brightness, adjust midtone gamma levels, and expand shadows.</p>
+              
+              <div class="drop-zone" id="light-drop-zone">
+                <i data-lucide="sun" class="upload-icon"></i>
+                <p>Drag & drop or <span class="highlight">browse</span></p>
+                <input type="file" id="light-file-input" accept="image/*" class="file-input">
+              </div>
+              
+              <div class="preview-box" id="light-preview-box" style="display: none;">
+                <button class="btn btn-danger btn-sm" id="btn-light-clear">Remove</button>
+              </div>
+
+              <button class="btn btn-accent w-100 mt-4" id="btn-light-process" disabled>
+                <i data-lucide="sun-medium"></i> Auto-Balance Lighting
+              </button>
+            </div>
+
+            <div class="glass-card result-section flex-col">
+              <h3>Corrected Slider Comparison</h3>
+              <div class="result-placeholder" id="light-placeholder">
+                <i data-lucide="contrast" class="icon-lg"></i>
+                <p>Correct dark environments instantly and compare dynamic range with the slide overlay.</p>
+              </div>
+              
+              <div class="result-view" id="light-result" style="display: none;">
+                <div class="slider-wrapper" id="light-slider-wrapper">
+                  <!-- Original Image -->
+                  <div class="slider-image original">
+                    <img id="light-img-original" src="#" alt="Original">
+                  </div>
+                  <!-- Enhanced Image -->
+                  <div class="slider-image modified" id="light-slider-modified">
+                    <canvas id="light-canvas-enhanced"></canvas>
+                  </div>
+                  <!-- Slider Controller -->
+                  <div class="slider-handle" id="light-slider-handle">
+                    <div class="slider-handle-line"></div>
+                    <div class="slider-handle-button"><i data-lucide="arrow-left-right"></i></div>
+                  </div>
+                </div>
+                <div class="flex-row mt-4">
+                  <a id="btn-light-download" class="btn btn-accent flex-1" download="zynappz_light_corrected.png" href="#">
+                    <i data-lucide="download"></i> Download Balanced Image
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 3: AI DETECTOR -->
+      <section class="page" id="page-detector">
+        <div class="page-header">
+          <h1>AI Content <span class="badge">Detector</span></h1>
+          <p class="subtitle">Scans text, documents, images, and videos using Vision-Claude intelligence to flag AI generation</p>
+        </div>
+        
+        <div class="grid-2col">
+          <!-- Input Area -->
+          <div class="glass-card upload-section">
+            <h3>Detector Upload</h3>
+            <p class="text-muted">Paste text or upload multiple formats (images, videos, PDF, TXT) to evaluate authenticity.</p>
+            
+            <div class="tabs-navigation-sm">
+              <button class="detector-tab active" data-mode="text">Paste Text</button>
+              <button class="detector-tab" data-mode="upload">File Upload</button>
+            </div>
+
+            <!-- Mode 1: Text Input -->
+            <div class="detector-mode-content active" id="detector-text-mode">
+              <textarea class="textarea-custom" id="detector-text-input" placeholder="Paste content here (at least 20 words for higher accuracy)..." rows="10"></textarea>
+            </div>
+
+            <!-- Mode 2: File Upload -->
+            <div class="detector-mode-content" id="detector-upload-mode" style="display: none;">
+              <div class="drop-zone" id="detector-drop-zone">
+                <i data-lucide="file-digit" class="upload-icon"></i>
+                <p>Drag & drop or <span class="highlight">browse</span></p>
+                <p class="text-xs text-muted mt-1">Supports PDF, TXT, PNG, JPG, or MP4/WebM videos</p>
+                <input type="file" id="detector-file-input" accept="image/*,video/*,.pdf,.txt" class="file-input">
+              </div>
+              
+              <div class="preview-box" id="detector-preview-box" style="display: none;">
+                <div id="detector-file-meta" class="file-meta-box">
+                  <!-- Filled via JS -->
+                </div>
+                <button class="btn btn-danger btn-sm" id="btn-detector-clear">Remove File</button>
+              </div>
+            </div>
+
+            <button class="btn btn-accent w-100 mt-4" id="btn-detector-analyze">
+              <i data-lucide="shield-alert"></i> Analyze with Claude API
+            </button>
+          </div>
+
+          <!-- Output Area -->
+          <div class="glass-card result-section flex-col">
+            <h3>Detection Results</h3>
+            
+            <div class="result-placeholder" id="detector-placeholder">
+              <i data-lucide="activity" class="icon-lg"></i>
+              <p>Submit content or files on the left to see the interactive verdict analysis.</p>
+            </div>
+
+            <div class="result-view" id="detector-result" style="display: none;">
+              <div class="detector-metrics-row">
+                <!-- Arc Gauge -->
+                <div class="gauge-container">
+                  <svg class="gauge" viewBox="0 0 100 50">
+                    <path class="gauge-bg" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke-width="8" stroke-linecap="round"/>
+                    <path class="gauge-fill" id="detector-gauge-fill" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke-width="8" stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round"/>
+                  </svg>
+                  <div class="gauge-value" id="detector-gauge-value">0%</div>
+                  <div class="gauge-label">Confidence</div>
+                </div>
+
+                <div class="verdict-summary">
+                  <div class="badge-verdict" id="detector-verdict-badge">Human</div>
+                  <p class="text-sm mt-2">Analyzed by <strong>Claude API</strong></p>
+                </div>
+              </div>
+
+              <div class="verdict-details mt-4">
+                <h4>Reasoning & Breakdown</h4>
+                <p class="explanation-text" id="detector-explanation"></p>
+                
+                <h4 class="mt-4">Specific Indicators Detected</h4>
+                <ul class="indicators-list" id="detector-indicators">
+                  <!-- Populated via JS -->
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 4: AI NEWS -->
+      <section class="page" id="page-news">
+        <div class="page-header flex-header">
+          <div>
+            <h1>AI <span class="badge">News Feed</span></h1>
+            <p class="subtitle">Latest updates in Artificial Intelligence & Technology</p>
+          </div>
+          <div class="news-controls">
+            <span class="timestamp-news" id="news-last-updated">Last Updated: Never</span>
+            <button class="btn btn-secondary btn-sm flex-row" id="btn-news-refresh">
+              <i data-lucide="refresh-cw"></i> Refresh
+            </button>
+          </div>
+        </div>
+        
+        <!-- News Card Grid -->
+        <div class="news-grid" id="news-container">
+          <!-- Filled with skeletons or items via JS -->
+        </div>
+      </section>
+
+      <!-- PAGE 5: AI LAWYER (LexAI) -->
+      <section class="page theme-lawyer" id="page-lawyer">
+        <!-- Lawyer Disclaimer Banner -->
+        <div class="lawyer-disclaimer">
+          <i data-lucide="alert-triangle"></i>
+          <span>⚠️ AI-generated legal information only. Not a substitute for a licensed attorney.</span>
+        </div>
+
+        <div class="page-header mt-2">
+          <h1 class="lawyer-title">LexAI <span class="badge badge-gold">Legal Advisor</span></h1>
+          <p class="subtitle gold-text">Sophisticated professional AI general counsel</p>
+        </div>
+        
+        <div class="chat-container glass-card lawyer-card">
+          <div class="chat-messages" id="lawyer-chat-messages">
+            <!-- Messages populated via JS -->
+            <div class="chat-bubble left system-lawyer">
+              <div class="bubble-avatar-lawyer"><i data-lucide="scale"></i></div>
+              <div class="bubble-content">
+                Welcome to <strong>LexAI</strong>. I am your specialized AI legal assistant.<br><br>
+                I can provide general legal resources, explain jurisprudential concepts, analyze general contracts, and outline state statutes.<br><br>
+                <em>Disclaimer: I am not a licensed attorney, and our interactions do not constitute an attorney-client relationship. Please seek independent counsel for critical matters.</em>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Typing Indicator -->
+          <div class="typing-indicator indicator-gold" id="lawyer-typing-indicator" style="display: none;">
+            <span></span><span></span><span></span>
+          </div>
+
+          <div class="chat-input-area border-gold">
+            <input type="text" id="lawyer-chat-input" placeholder="Ask a general legal question or outline a contract scenario..." autocomplete="off">
+            <button class="btn btn-gold" id="btn-lawyer-send">
+              <i data-lucide="scale"></i> Send
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 6: GALLERY -->
+      <section class="page" id="page-gallery">
+        <div class="page-header">
+          <h1>Creative <span class="badge">Gallery</span></h1>
+          <p class="subtitle">Beautiful images crafted by Zy Chatbot using Pollinations AI</p>
+        </div>
+        
+        <!-- Gallery Grid -->
+        <div class="gallery-grid" id="gallery-container">
+          <!-- Filled via JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="gallery-empty-state glass-card" id="gallery-empty" style="display: none;">
+          <i data-lucide="image-off" class="icon-lg"></i>
+          <h3>Empty Creative Sandbox</h3>
+          <p class="text-muted">No images generated yet! Open the Zy Chatbot tab and ask Zy to "generate an image of a galaxy" to populate your canvas.</p>
+          <button class="btn btn-accent mt-4" id="btn-gallery-go-zy">
+            Go to Zy Chatbot
+          </button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p>Built with ❤️ by Team Zynappz — Hari, Sreedev, Ben, Devanandan & Navaneeth</p>
+  </footer>
+
+  <!-- API KEYS SETTING MODAL -->
+  <div class="modal-overlay" id="modal-settings">
+    <div class="modal-container glass-card">
+      <div class="modal-header">
+        <h3><i data-lucide="key-round" class="icon-inline"></i> Setup API Credentials</h3>
+        <button class="icon-btn" id="btn-close-settings-modal"><i data-lucide="x"></i></button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="alert-box alert-warning">
+          <i data-lucide="shield-alert"></i>
+          <div>
+            <strong>Important Safety Notice:</strong> Your keys are stored <strong>strictly locally</strong> in your browser's localstorage. No keys are ever uploaded to Zynappz servers.
+          </div>
+        </div>
+        
+        <form class="settings-form" id="form-settings">
+          <div class="form-group">
+            <label for="key-openai">OpenAI API Key</label>
+            <input type="password" id="key-openai" placeholder="sk-proj-..." autocomplete="off">
+            <small class="text-muted">Required for <strong>AI Enhance</strong> (Vision/gpt-4o).</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="key-anthropic">Anthropic Claude API Key</label>
+            <input type="password" id="key-anthropic" placeholder="sk-ant-..." autocomplete="off">
+            <small class="text-muted">Required for <strong>Zy Assistant</strong>, <strong>AI Lawyer</strong>, and <strong>AI Detector</strong>.</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="key-news">NewsAPI Key</label>
+            <input type="password" id="key-news" placeholder="Enter NewsAPI Key..." autocomplete="off">
+            <small class="text-muted">Required for <strong>AI News Feed</strong>.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="key-removebg">Remove.bg API Key</label>
+            <input type="password" id="key-removebg" placeholder="Enter remove.bg key..." autocomplete="off">
+            <small class="text-muted">Required for <strong>BG Remover</strong> tool.</small>
+          </div>
+
+          <button type="submit" class="btn btn-accent w-100 mt-4">
+            <i data-lucide="save"></i> Save Credentials
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHTBOX MODAL FOR GALLERY -->
+  <div class="modal-overlay" id="modal-lightbox">
+    <div class="lightbox-container">
+      <button class="icon-btn lightbox-close" id="btn-close-lightbox"><i data-lucide="x"></i></button>
+      <div class="lightbox-content">
+        <img id="lightbox-img" src="#" alt="Lightbox Fullscreen">
+        <div class="lightbox-caption">
+          <p class="lightbox-prompt" id="lightbox-prompt-text"></p>
+          <span class="lightbox-date" id="lightbox-date-text"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Lucide Icons Bundle from CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Application JS Router and Logic -->
+</body>
+</html>
